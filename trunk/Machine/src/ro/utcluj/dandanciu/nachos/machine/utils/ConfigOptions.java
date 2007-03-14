@@ -51,6 +51,10 @@ public class ConfigOptions {
 
 	public static final int DiskNoOfTraks = 6;
 
+	public static final int DiskSeekTime = 100;
+
+	public static final int DiskRotationTime = 10;
+
 	/**
 	 * Flag for indecating if we should suspend after each simulate instruction
 	 */

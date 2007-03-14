@@ -11,8 +11,6 @@ public abstract class Device {
 	
 	private boolean inService = false;
 	
-	public abstract void handleInterruput();
-
 	/**
 	 * @return the inService
 	 */
