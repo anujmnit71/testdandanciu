@@ -27,8 +27,8 @@ public class Processor {
 			try {
 				this.oneInstruction();
 			} catch (PhysicalException e) {
-				InterruptRequest rq = e.getInterruptRequest(this);
-				getLocalApic().addRequest(rq);
+				//TODO: handle this
+				e.handle();
 			}
 		}
 		

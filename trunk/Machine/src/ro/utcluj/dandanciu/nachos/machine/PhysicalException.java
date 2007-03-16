@@ -75,4 +75,9 @@ public class PhysicalException extends Exception {
 	public int getType() {
 		return type;
 	}
+
+	public void handle() {
+		// TODO add handle exception code
+		
+	}
 }

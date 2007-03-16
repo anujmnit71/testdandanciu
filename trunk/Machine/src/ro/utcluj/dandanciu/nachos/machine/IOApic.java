@@ -10,7 +10,7 @@ import java.util.List;
  * @author Dan Danciu
  * 
  */
-public class IOApic {
+public class IOApic implements Apic {
 
 	private int counter = 0;
 
@@ -22,14 +22,9 @@ public class IOApic {
 		localApics.add(localApic);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see ro.utcluj.dandanciu.nachos.machine.Apic#connect(ro.utcluj.dandanciu.nachos.machine.Device,
-	 *      int)
-	 */
-	public void connect(Interrupt intr, int position) {
-		interrupts[position] = intr;
+
+	public void setInterruptsArray(Interrupt[] interrupts) {
+		this.interrupts = interrupts;
 	}
 
 	private void dispach(int code) {
@@ -43,13 +38,13 @@ public class IOApic {
 		} else { 
 			apicToService = localApics.get(intr.getApicId());
 		}
-		InterruptRequest ir = new InterruptRequest();
-		ir.setInterrupt(intr);
-		ir.setStatus(InterruptRequest.PENDING);
-		apicToService.addRequest(ir);
+		
 		
 	}
 
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.nachos.machine.Apic#IRqX(int)
+	 */
 	public void IRqX(int code) {
 		dispach(code);
 	}
