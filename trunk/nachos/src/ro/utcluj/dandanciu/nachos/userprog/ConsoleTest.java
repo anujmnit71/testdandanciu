@@ -12,80 +12,79 @@ import ro.utcluj.dandanciu.nachos.machine.Console;
 import ro.utcluj.dandanciu.nachos.threads.Debug;
 import ro.utcluj.dandanciu.nachos.threads.Semaphore;
 
-
 public class ConsoleTest {
 
-  // Objects needed for the console test.  Threads making
-  // I/O requests wait on a Semaphore to delay until the I/O completes.
+	// Objects needed for the console test. Threads making
+	// I/O requests wait on a Semaphore to delay until the I/O completes.
 
-  private static Console console;
-  private static Semaphore readAvail;
-  private static Semaphore writeDone;
+	private static Console console;
 
+	private static Semaphore readAvail;
 
-  //----------------------------------------------------------------------
-  // ConsoleTest.run()
-  // 	Test the console by echoing characters typed at the input onto
-  //	the output.  Stop when the user types a 'q'.
-  //----------------------------------------------------------------------
+	private static Semaphore writeDone;
 
-  public static void run(String in, String out) {
-    char ch;
+	// ----------------------------------------------------------------------
+	// ConsoleTest.run()
+	// Test the console by echoing characters typed at the input onto
+	// the output. Stop when the user types a 'q'.
+	// ----------------------------------------------------------------------
 
-    Debug.println('c', "ConsoleTest: starting");
+	public static void run(String in, String out) {
+		char ch;
 
-    readAvail = new Semaphore("read avail", 0);
-    writeDone = new Semaphore("write done", 0);
-    try {
-      console = new Console(in, out, new ConsHandler(readAvail), 
-			    new ConsHandler(writeDone));
-    } catch (IOException e) {
-      Debug.println('c', "ConsoleTest: IO Error!");
-    }
+		Debug.println('c', "ConsoleTest: starting");
 
-    while (true) {
-      //Debug.println('c', "ConsoleTest: 0");
-      readAvail.P();		// wait for character to arrive
-      //Debug.println('c', "ConsoleTest: 1");
-      try {
-	ch = console.getChar();
-      } catch (IOException e) {
-	Debug.println('c', "ConsoleTest: should not happen!");
-	return;
-      }
+		readAvail = new Semaphore("read avail", 0);
+		writeDone = new Semaphore("write done", 0);
+		try {
+			console = new Console(in, out, new ConsHandler(readAvail),
+					new ConsHandler(writeDone));
+		} catch (IOException e) {
+			Debug.println('c', "ConsoleTest: IO Error!");
+		}
 
-      try {
-	console.putChar(ch);	// echo it!
-      } catch (IOException e) {
-	Debug.println('c', "ConsoleTest: should not happen!");
-	return;
-      }
-      //Debug.println('c', "ConsoleTest: 2");
-      writeDone.P();            // wait for write to finish
-      //Debug.println('c', "ConsoleTest: 3");
-      if (ch == 'q') return;    // if q, quit
-    }
-  }
+		while (true) {
+			// Debug.println('c', "ConsoleTest: 0");
+			readAvail.P(); // wait for character to arrive
+			// Debug.println('c', "ConsoleTest: 1");
+			try {
+				ch = console.getChar();
+			} catch (IOException e) {
+				Debug.println('c', "ConsoleTest: should not happen!");
+				return;
+			}
+
+			try {
+				console.putChar(ch); // echo it!
+			} catch (IOException e) {
+				Debug.println('c', "ConsoleTest: should not happen!");
+				return;
+			}
+			// Debug.println('c', "ConsoleTest: 2");
+			writeDone.P(); // wait for write to finish
+			// Debug.println('c', "ConsoleTest: 3");
+			if (ch == 'q')
+				return; // if q, quit
+		}
+	}
 
 }
 
-
-//----------------------------------------------------------------------
+// ----------------------------------------------------------------------
 // Console interrupt handlers
-// 	Wake up the thread that requested the I/O.
-//----------------------------------------------------------------------
-
+// Wake up the thread that requested the I/O.
+// ----------------------------------------------------------------------
 
 class ConsHandler implements Runnable {
-  private Semaphore semaphore;
+	private Semaphore semaphore;
 
-  public ConsHandler(Semaphore s) {
-    semaphore = s;
-  }
+	public ConsHandler(Semaphore s) {
+		semaphore = s;
+	}
 
-  public void run() {
-    //Debug.println('c', "ConsoleTest: 10 " + semaphore.name);
-    semaphore.V();
-  }
+	public void run() {
+		// Debug.println('c', "ConsoleTest: 10 " + semaphore.name);
+		semaphore.V();
+	}
 
 }
