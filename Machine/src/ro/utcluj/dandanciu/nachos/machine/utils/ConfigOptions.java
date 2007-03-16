@@ -41,7 +41,7 @@ public class ConfigOptions {
 	 * The size of the String represeting the id of the file type for emulating
 	 * the hardisk
 	 */
-	public static final int DiskFileTypeIdSize = 4;
+	public static final int DiskFileTypeIdSize = 6;
 
 	/**
 	 * The size of the String represeting the id of the file type for emulating
@@ -54,6 +54,8 @@ public class ConfigOptions {
 	public static final int DiskSeekTime = 100;
 
 	public static final int DiskRotationTime = 10;
+
+	public static final byte[] DiskEOF = { 0x55 };
 
 	/**
 	 * Flag for indecating if we should suspend after each simulate instruction

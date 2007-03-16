@@ -32,7 +32,8 @@ public class HardDisk extends Device implements Runnable {
 
 	private int lastSector;
 
-	public HardDisk(String name) {
+	public HardDisk(String name, Apic apic, int code) {
+		super(apic, code);
 
 		this.name = name;
 		this.traks = ConfigOptions.DiskNoOfTraks;
@@ -47,7 +48,7 @@ public class HardDisk extends Device implements Runnable {
 
 			// need to write at end of file, so that reads will not return EOF
 			support.seek(getSize() - 4);
-			support.writeInt(0);
+			support.write(ConfigOptions.DiskEOF); 
 
 		} catch (Exception e) {
 			logger.error("HardDisk(String)", e); //$NON-NLS-1$
@@ -78,15 +79,16 @@ public class HardDisk extends Device implements Runnable {
 
 			int ticks = computeLatency(sectorNumber);
 
-			this.wait(ticks * ConfigOptions.TickLenght);
+			//this.wait(ticks * ConfigOptions.TickLenght);
 
 			active = true;
-			setBuffer(data);
 			this.lastSector = sectorNumber;
 
 			support.seek(ConfigOptions.DiskSizeOfSector * sectorNumber
 					+ ConfigOptions.DiskFileTypeIdSize);
 			support.read(data, index, ConfigOptions.DiskSizeOfSector);
+			
+			this.buffer = data;
 
 		} catch (Exception e) {
 			logger.error("readRequest(int, int)", e); //$NON-NLS-1$
@@ -111,7 +113,7 @@ public class HardDisk extends Device implements Runnable {
 
 			int ticks = computeLatency(sectorNumber);
 
-			this.wait(ticks * ConfigOptions.TickLenght);
+			//this.wait(ticks * ConfigOptions.TickLenght);
 			
 			byte[] data = getBuffer();
 			
@@ -231,10 +233,20 @@ public class HardDisk extends Device implements Runnable {
 	 *            the buffer to set
 	 */
 	public void setBuffer(byte[] buffer) {
-		this.buffer = buffer;
+		assert (buffer.length > ConfigOptions.DiskSizeOfSector);
+		this.buffer = new byte[ConfigOptions.DiskSizeOfSector]; 
+		for(int i = 0; i < ConfigOptions.DiskSizeOfSector; i++){
+			this.buffer[i] = (i < buffer.length) ? buffer[i] : 0;
+		}
 	}
 
 	public void run() {
+		
+	}
+
+	@Override
+	public void handle() {
+		// TODO Auto-generated method stub
 		
 	}
 }

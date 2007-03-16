@@ -5,12 +5,34 @@ package ro.utcluj.dandanciu.nachos.machine;
 
 /**
  * @author Dan Danciu
- *
+ * 
  */
-public abstract class Device {
-	
+public abstract class Device extends Thread {
+
+	private int code;
+
+	private Apic apic;
+
 	private boolean inService = false;
-	
+
+	public Device(Apic apic, int code) {
+		this.apic = apic;
+		this.code = code;
+	}
+
+	protected void triggerInterrupt() {
+		apic.IRqX(code);
+	}
+
+	public final void handleInterrupt() {
+		new Thread(new Runnable() {
+			public void run() {
+				Device.this.handle();
+			}
+		}).start();
+		Thread.yield();
+	}
+
 	/**
 	 * @return the inService
 	 */
@@ -19,10 +41,13 @@ public abstract class Device {
 	}
 
 	/**
-	 * @param inService the inService to set
+	 * @param inService
+	 *            the inService to set
 	 */
 	public void setInService(boolean inService) {
 		this.inService = inService;
 	}
+	
+	public abstract void handle();
 
 }
