@@ -38,7 +38,6 @@ public class InputDevice extends Device {
 			while (!empty)
 				condition.await();
 			this.buffer = c;
-			this.available = true;
 			empty = false;
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -51,7 +50,7 @@ public class InputDevice extends Device {
 	public void handle() {
 
 		lock.lock();
-		if (available) {
+		if (!empty) {
 			this.data.offer(buffer);
 			empty = true;
 			condition.signal();
