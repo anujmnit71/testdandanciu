@@ -24,11 +24,15 @@ public class Processor {
 	
 	public void tick(){
 		if (this.getState().equals(ProcessorState.RUNNING)) {
+			if(!getLocalApic().isEmpty()){
+				InterruptRequest ir = getLocalApic().getNext();
+				ir.getInterrupt().getDevice().handle();
+				return;
+			}
 			try {
 				this.oneInstruction();
 			} catch (PhysicalException e) {
-				//TODO: handle this
-				e.handle();
+				getLocalApic().IRqX(e.getType());
 			}
 		}
 		
