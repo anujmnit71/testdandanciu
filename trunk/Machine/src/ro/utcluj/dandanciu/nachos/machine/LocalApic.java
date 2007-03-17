@@ -51,6 +51,10 @@ public class LocalApic implements Apic{
 		this.interrupts = interrupts;
 		
 	}
+
+	public boolean isEmpty() {
+		return data.isEmpty();
+	}
 	
 	
 	
