@@ -8,9 +8,6 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ro.utcluj.dandanciu.utils.collections.ArrayStack;
-import ro.utcluj.dandanciu.utils.collections.Stack;
-
 public class OutputDevice extends Device {
 
 	private OutputStream os;
@@ -38,7 +35,6 @@ public class OutputDevice extends Device {
 			buffer = data.poll();
 			empty = false;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		lock.unlock();
@@ -56,7 +52,6 @@ public class OutputDevice extends Device {
 			try {
 				this.os.write(buffer);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			empty = true;

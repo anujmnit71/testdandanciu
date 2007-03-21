@@ -3,6 +3,7 @@ package ro.utcluj.dandanciu.nachos.machine;
 import ro.utcluj.dandanciu.nachos.machine.exceptions.IllegalWordSizeException;
 import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.machine.utils.Constants;
+import ro.utcluj.dandanciu.nachos.machine.vm.LocalMmu;
 
 public class Processor {
 
@@ -111,6 +112,8 @@ public class Processor {
 	private Register[] registers;
 
 	private Memory cache = new Memory(1, 4, 0.25);
+
+	private LocalMmu localMmu;
 
 	/**
 	 * Execute one instruction from a user-level program
@@ -785,6 +788,10 @@ public class Processor {
 	 */
 	public void setLocalApic(LocalApic localApic) {
 		this.localApic = localApic;
+	}
+
+	public void setLocalMmu(LocalMmu localMmu) {
+		this.localMmu = localMmu;		
 	}
 
 }

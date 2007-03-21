@@ -3,10 +3,10 @@
  */
 package ro.utcluj.dandanciu.nachos.machine;
 
-import org.apache.log4j.Logger;
-
 import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
+
+import org.apache.log4j.Logger;
 
 import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
 
