@@ -78,6 +78,21 @@ public class Word {
 		}
 	}
 
+	public boolean[] getBits(int index, int lenght) {
+		boolean[] rez = new boolean[lenght];
+		String binary = Integer.toBinaryString(intValue());
+		for (int i = 0; i < lenght; i++) {
+			rez[i] = (binary.charAt((size * 8) - index + i) == '1');
+		}
+		return rez;
+	}
+
+	public int getBitsIntValue(int index, int lenght) {
+		String binary = Integer.toBinaryString(intValue()).substring(
+				(size * 8) - index - 1, lenght);
+		return Integer.parseInt(binary, 2);
+	}
+
 	public final static Word getByteWord() {
 		return new Word(1);
 	}
@@ -122,20 +137,18 @@ public class Word {
 	public boolean equals(Object obj) {
 		return this.intValue() == ((Word) obj).intValue();
 	}
-	
-	
-	public String toString(){
+
+	public String toString() {
 		StringBuffer buff = new StringBuffer();
-		
+
 		buff.append("[");
-			for(int i = 0; i < size; i++) {
-				buff.append(data[i]);
-				buff.append(" ");
-			}
+		for (int i = 0; i < size; i++) {
+			buff.append(data[i]);
+			buff.append(" ");
+		}
 		buff.append("] : ");
 		buff.append(intValue());
 		return buff.toString();
 	}
-	
-	
+
 }

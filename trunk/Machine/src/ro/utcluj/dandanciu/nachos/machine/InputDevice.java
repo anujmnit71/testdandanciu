@@ -6,14 +6,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import ro.utcluj.dandanciu.utils.collections.ArrayStack;
-import ro.utcluj.dandanciu.utils.collections.Stack;
-
 public class InputDevice extends Device {
 
 	public InputDevice(Apic apic, int code) {
 		super(apic, code);
-		// TODO Auto-generated constructor stub
 	}
 
 	private Queue<Character> data = new LinkedList<Character>();
@@ -25,8 +21,6 @@ public class InputDevice extends Device {
 	Condition condition = lock.newCondition();
 
 	boolean empty = true;
-
-	private boolean available = false;
 
 	public char getChar() {
 		return data.poll();
@@ -40,7 +34,6 @@ public class InputDevice extends Device {
 			this.buffer = c;
 			empty = false;
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		lock.unlock();

@@ -1,9 +1,9 @@
 package ro.utcluj.dandanciu.nachos.machine;
 
-import org.apache.log4j.Logger;
-
 import java.util.Timer;
 import java.util.TimerTask;
+
+import org.apache.log4j.Logger;
 
 import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
 

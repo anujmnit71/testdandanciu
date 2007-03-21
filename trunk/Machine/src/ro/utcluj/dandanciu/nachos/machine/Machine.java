@@ -61,8 +61,8 @@ public class Machine {
 		Machine.getInstance().start();
 	}
 
-	public static void reset() {
-		// TODO Auto-generated method stub
+	public void reset() {
+		// TODO reset the machine
 
 	}
 
