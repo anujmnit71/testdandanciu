@@ -3,12 +3,13 @@ package ro.utcluj.dandanciu.nachos.machine;
 import ro.utcluj.dandanciu.nachos.machine.exceptions.IllegalWordSizeException;
 import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.machine.utils.Constants;
-import ro.utcluj.dandanciu.nachos.machine.vm.LocalMmu;
+import ro.utcluj.dandanciu.nachos.machine.vm.LocalMemoryManagementUnit;
+import ro.utcluj.dandanciu.nachos.machine.vm.MemoryConfigOptions;
 
 public class Processor {
 
 	private ProcessorState state;
-	
+
 	private LocalApic localApic;
 
 	private int id;
@@ -16,16 +17,20 @@ public class Processor {
 	public Processor(int id) {
 		this.id = id;
 		state = ProcessorState.IDLE;
-		localApic = new LocalApic(id);		
+		localApic = new LocalApic(id);
 		registers = new Register[ConfigOptions.NoOfRegisters];
 		for (int i = 0; i < ConfigOptions.NoOfRegisters; i++) {
 			registers[i] = new Register();
 		}
+
+		cache = new Memory(MemoryConfigOptions.CACHE_ADDRESS_WORD_SIZE,
+				MemoryConfigOptions.CACHAE_DATA_WORD_SIZE,
+				MemoryConfigOptions.CACHE_SIZE_IN_KB);
 	}
-	
-	public void tick(){
+
+	public void tick() {
 		if (this.getState().equals(ProcessorState.RUNNING)) {
-			if(!getLocalApic().isEmpty()){
+			if (!getLocalApic().isEmpty()) {
 				InterruptRequest ir = getLocalApic().getNext();
 				ir.getInterrupt().getDevice().handle();
 				return;
@@ -36,8 +41,7 @@ public class Processor {
 				getLocalApic().IRqX(e.getType());
 			}
 		}
-		
-		
+
 	}
 
 	// User program CPU state. The full set of MIPS registers, plus a few
@@ -103,7 +107,7 @@ public class Processor {
 	 * Indicates the number of virtual pages
 	 */
 	public static int pageTableSize;
-	
+
 	// TODO: add pageTable
 
 	/**
@@ -111,9 +115,9 @@ public class Processor {
 	 */
 	private Register[] registers;
 
-	private Memory cache = new Memory(1, 4, 0.25);
+	private Memory cache;
 
-	private LocalMmu localMmu;
+	private LocalMemoryManagementUnit localMmu;
 
 	/**
 	 * Execute one instruction from a user-level program
@@ -142,7 +146,7 @@ public class Processor {
 		Instruction instruction = null;
 
 		// Fetch instruction
-		instruction.value = readMem(registers[PCReg].intValue(), 4);
+		instruction.value = readMem(registers[PCReg].intValue(), 4, false);
 
 		instruction.decode();
 
@@ -292,7 +296,7 @@ public class Processor {
 		case Instruction.OP_LBU:
 			tmp = registers[instruction.rs].intValue() + instruction.extra;
 
-			value = readMem(tmp, 1);
+			value = readMem(tmp, 1, true);
 
 			if ((value & 0x80) != 0
 					&& (instruction.opCode == Instruction.OP_LB))
@@ -310,7 +314,7 @@ public class Processor {
 				raiseException(PhysicalException.ADDRESS_ERROR_EXCEPTION, tmp);
 				return;
 			}
-			value = readMem(tmp, 2);
+			value = readMem(tmp, 2, true);
 
 			if ((value & 0x8000) != 0
 					&& (instruction.opCode == Instruction.OP_LH))
@@ -331,7 +335,7 @@ public class Processor {
 				raiseException(PhysicalException.ADDRESS_ERROR_EXCEPTION, tmp);
 				return;
 			}
-			value = readMem(tmp, 4);
+			value = readMem(tmp, 4, true);
 			nextLoadReg = instruction.rt;
 			nextLoadValue = value;
 			break;
@@ -344,7 +348,7 @@ public class Processor {
 			// fail (I think) if the other cases are ever exercised.
 			assert ((tmp & 0x3) == 0);
 
-			value = readMem(tmp, 4);
+			value = readMem(tmp, 4, true);
 			if (registers[LoadReg].intValue() == instruction.rt)
 				nextLoadValue = registers[LoadValueReg].intValue();
 			else
@@ -374,7 +378,7 @@ public class Processor {
 			// fail (I think) if the other cases are ever exercised.
 			assert ((tmp & 0x3) == 0);
 
-			value = readMem(tmp, 4);
+			value = readMem(tmp, 4, true);
 			if (registers[LoadReg].intValue() == instruction.rt)
 				nextLoadValue = registers[LoadValueReg].intValue();
 			else
@@ -416,7 +420,7 @@ public class Processor {
 			break;
 
 		case Instruction.OP_MULT:
-			int[] mresult = new int[2];			
+			int[] mresult = new int[2];
 			mult(registers[instruction.rs].intValue(),
 					registers[instruction.rt].intValue(), true, mresult);
 			registers[HiReg].setValue(mresult[0]);
@@ -424,7 +428,7 @@ public class Processor {
 			break;
 
 		case Instruction.OP_MULTU:
-			int[] mres = new int[2];	
+			int[] mres = new int[2];
 			mult(registers[instruction.rs].intValue(),
 					registers[instruction.rt].intValue(), false, mres);
 			registers[HiReg].setValue(mres[0]);
@@ -451,14 +455,14 @@ public class Processor {
 		case Instruction.OP_SB:
 			if (!writeMem(
 					(registers[instruction.rs].intValue() + instruction.extra),
-					1, registers[instruction.rt].intValue()))
+					1, registers[instruction.rt].intValue(), true))
 				return;
 			break;
 
 		case Instruction.OP_SH:
 			if (!writeMem(
 					(registers[instruction.rs].intValue() + instruction.extra),
-					2, registers[instruction.rt].intValue()))
+					2, registers[instruction.rt].intValue(), true))
 				return;
 			break;
 
@@ -552,7 +556,7 @@ public class Processor {
 		case Instruction.OP_SW:
 			if (!writeMem(
 					(registers[instruction.rs].intValue() + instruction.extra),
-					4, registers[instruction.rt].intValue()))
+					4, registers[instruction.rt].intValue(), true))
 				return;
 			break;
 
@@ -563,7 +567,7 @@ public class Processor {
 			// fail (I think) if the other cases are ever exercised.
 			assert ((tmp & 0x3) == 0);
 
-			value = readMem((tmp & ~0x3), 4);
+			value = readMem((tmp & ~0x3), 4, true);
 			switch (tmp & 0x3) {
 			case 0:
 				value = registers[instruction.rt].intValue();
@@ -581,7 +585,7 @@ public class Processor {
 						| ((registers[instruction.rt].intValue() >> 24) & 0xff);
 				break;
 			}
-			if (!writeMem((tmp & ~0x3), 4, value))
+			if (!writeMem((tmp & ~0x3), 4, value, true))
 				return;
 			break;
 
@@ -592,7 +596,7 @@ public class Processor {
 			// fail (I think) if the other cases are ever exercised.
 			assert ((tmp & 0x3) == 0);
 
-			value = readMem((tmp & ~0x3), 4);
+			value = readMem((tmp & ~0x3), 4, true);
 			switch (tmp & 0x3) {
 			case 0:
 				value = (value & 0xffffff)
@@ -610,7 +614,7 @@ public class Processor {
 				value = registers[instruction.rt].intValue();
 				break;
 			}
-			if (!writeMem((tmp & ~0x3), 4, value))
+			if (!writeMem((tmp & ~0x3), 4, value, true))
 				return;
 			break;
 
@@ -713,10 +717,18 @@ public class Processor {
 		throw exception;
 	}
 
-	private int readMem(int address, int size) throws PhysicalException {
-		Word dataWord = null;
-		Word addressWord = null;
+	private int readMem(int address, int size, boolean isData)
+			throws PhysicalException {
 		try {
+
+			if (localMmu != null) {
+				int asid = 0;
+				// TODO get the asid
+				return localMmu.read(asid, address, size, isData);
+			}
+
+			Word dataWord = null;
+			Word addressWord = null;
 			dataWord = Word.getWordOfSize(size);
 			addressWord = Word.getWordOfSize(cache.getAddressWordSize());
 			addressWord.setValue(address);
@@ -724,16 +736,22 @@ public class Processor {
 			return dataWord.intValue();
 		} catch (IllegalWordSizeException e) {
 			raiseException(PhysicalException.ADDRESS_ERROR_EXCEPTION, address);
-			assert false;
 		}
+		assert (false);
 		return 0;
 	}
 
-	private boolean writeMem(int address, int size, int value)
+	private boolean writeMem(int address, int size, int value, boolean isData)
 			throws PhysicalException {
-		Word dataWord = null;
-		Word addressWord = null;
 		try {
+			if (localMmu != null) {
+				int asid = 0;
+				// TODO get the asid
+				localMmu.write(asid, address, size, value, isData);
+				return true;
+			}
+			Word dataWord = null;
+			Word addressWord = null;
 			dataWord = Word.getWordOfSize(size);
 			addressWord = Word.getWordOfSize(cache.getAddressWordSize());
 			addressWord.setValue(address);
@@ -770,7 +788,8 @@ public class Processor {
 	}
 
 	/**
-	 * @param id the id to set
+	 * @param id
+	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
@@ -784,14 +803,30 @@ public class Processor {
 	}
 
 	/**
-	 * @param localApic the localApic to set
+	 * @param localApic
+	 *            the localApic to set
 	 */
 	public void setLocalApic(LocalApic localApic) {
 		this.localApic = localApic;
 	}
 
-	public void setLocalMmu(LocalMmu localMmu) {
-		this.localMmu = localMmu;		
+	public void setLocalMmu(LocalMemoryManagementUnit localMmu) {
+		this.localMmu = localMmu;
+	}
+
+	/**
+	 * @return the cache
+	 */
+	public Memory getCache() {
+		return cache;
+	}
+
+	/**
+	 * @param cache
+	 *            the cache to set
+	 */
+	public void setCache(Memory cache) {
+		this.cache = cache;
 	}
 
 }

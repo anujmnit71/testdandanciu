@@ -12,34 +12,27 @@ import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.NotCachableException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.TlbDirtyException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.TlbInvalidException;
 
-public class LocalMmu extends AbstractMmu {
+public class LocalMmu extends AbstractLocalMmu implements LocalMemoryManagementUnit{
 	/**
 	 * Logger for this class
 	 */
 	private static final Logger logger = Logger.getLogger(LocalMmu.class);
 
-	private final static int TLB_SIZE = 3;
 
-	private final static int CACHE_ADDRESS_WORD_SIZE = 2;
-
-	private final static int CACHAE_DATA_WORD_SIZE = 4;
-
-	private final static int CACHE_SIZE_IN_KB = 24;
 
 	/**
 	 * Data TLB
 	 */
-	MiniTlb dtlb = new MiniTlb(TLB_SIZE);
+	private MiniTlb dtlb = new MiniTlb(MemoryConfigOptions.TLB_SIZE);
 
 	/**
 	 * Instruction TLB
 	 */
-	MiniTlb itlb = new MiniTlb(TLB_SIZE);
+	private MiniTlb itlb = new MiniTlb(MemoryConfigOptions.TLB_SIZE);
 	
-	GlobalMmu globalMmu;
+	private GlobalMmu globalMmu;
 
-	Memory cache = new Memory(CACHE_ADDRESS_WORD_SIZE, CACHAE_DATA_WORD_SIZE,
-			CACHE_SIZE_IN_KB);
+	private Memory cache = null;
 
 	public int readMemory(int asid, int virtualAddress, int size) {
 		assert (false);
@@ -50,22 +43,23 @@ public class LocalMmu extends AbstractMmu {
 		assert (false);
 	}
 
-	public int readData(int asid, int virtualAddress, int size)
+	public int read(int asid, int virtualAddress, int size, boolean isData)
 			throws IllegalWordSizeException, PhysicalException {
 		int realAddress = 0;
+		MiniTlb tlb = isData ? dtlb : itlb;
 
 		try {
-			realAddress = dtlb.translate(virtualAddress, asid, false);
+			realAddress = tlb.translate(virtualAddress, asid, false);
 		} catch (EntryNotFoundException e) {
 			logger.warn(e);
-			globalMmu.refresh(this, virtualAddress);
+			globalMmu.refresh(this.cache, tlb.getIndexForNew(),virtualAddress);
 		} catch (IllegalMemoryAccessException e) {
 			logger.warn(e);
 			throw PhysicalException.ADDRESS_ERROR_EXCEPTION;
 		} catch (TlbDirtyException e) {
 			logger.warn(e);
-			globalMmu.refresh(this, virtualAddress);
-			return readData(asid, virtualAddress, size);
+			globalMmu.refresh(this.cache, tlb.getIndexFor(virtualAddress), virtualAddress);
+			return read(asid, virtualAddress, size, isData);
 		} catch (TlbInvalidException e) {
 			logger.warn(e);
 			throw PhysicalException.ADDRESS_ERROR_EXCEPTION;
@@ -74,7 +68,7 @@ public class LocalMmu extends AbstractMmu {
 			return globalMmu.readMemory(asid, virtualAddress, size);
 		}
 
-		Word address = Word.getWordOfSize(CACHE_ADDRESS_WORD_SIZE);
+		Word address = Word.getWordOfSize(MemoryConfigOptions.CACHE_ADDRESS_WORD_SIZE);
 		address.setValue(realAddress);
 		Word value = Word.getWordOfSize(size);
 		cache.load(address, value);
@@ -83,9 +77,59 @@ public class LocalMmu extends AbstractMmu {
 
 	}
 
+	public void write(int asid, int virtualAddress, int size, int value,
+			boolean isData) throws IllegalWordSizeException, PhysicalException {
+		int realAddress = 0;
+		MiniTlb tlb = isData ? dtlb : itlb;
+		try {
+			try {
+				realAddress = tlb.translate(virtualAddress, asid, false);
+			} catch (EntryNotFoundException e) {
+				logger.warn(e);
+				globalMmu.refresh(this.cache, tlb.getIndexForNew(), virtualAddress);
+			} catch (IllegalMemoryAccessException e) {
+				logger.warn(e);
+				throw PhysicalException.ADDRESS_ERROR_EXCEPTION;
+			} catch (TlbDirtyException e) {
+				logger.warn(e);
+				// we don't care if it is dirty already, we just write some more
+			} catch (TlbInvalidException e) {
+				logger.warn(e);
+				throw PhysicalException.ADDRESS_ERROR_EXCEPTION;
+			}
+
+			Word address = Word.getWordOfSize(MemoryConfigOptions.CACHE_ADDRESS_WORD_SIZE);
+			address.setValue(realAddress);
+			Word valueW = Word.getWordOfSize(size);
+			valueW.setValue(value);
+			cache.store(address, valueW);
+		} catch (NotCachableException e) {
+			logger.warn(e);
+		} finally {
+			//no meter what
+			// also write the global memory
+			globalMmu.writeMemory(this, asid, virtualAddress, value, size);
+		}
+	}
+
+	@Override
 	public void setDirty(int virtualAddress) {
 		dtlb.setDirty(virtualAddress);
-		itlb.setDirty(virtualAddress);		
+		itlb.setDirty(virtualAddress);
+	}
+
+	/**
+	 * @return the cache
+	 */
+	public Memory getCache() {
+		return cache;
+	}
+
+	/**
+	 * @param cache the cache to set
+	 */
+	public void setCache(Memory cache) {
+		this.cache = cache;
 	}
 
 }

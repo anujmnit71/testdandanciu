@@ -65,8 +65,12 @@ public class JointTlbEntry extends TlbEntry {
 	private boolean valid2 = false;
 	
 	@Override
-	void load(Word data) {
+	public void load(Word data) {
 		
+	}
+	@Override
+	public Word getWord() {
+		return null;
 	}
 
 	/**

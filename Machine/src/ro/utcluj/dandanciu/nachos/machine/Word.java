@@ -142,13 +142,22 @@ public class Word {
 		StringBuffer buff = new StringBuffer();
 
 		buff.append("[");
-		for (int i = 0; i < size; i++) {
-			buff.append(data[i]);
+		for (int i = size; i > 0; i--) {
+			buff.append(Integer.toHexString(data[i-1]));
 			buff.append(" ");
 		}
 		buff.append("] : ");
 		buff.append(intValue());
 		return buff.toString();
+	}
+	
+	public static String toBinary(int value, int size){
+		String binary = Integer.toBinaryString(value);
+		for(int i = binary.length(); i < size; i++){
+			binary = "0" + binary;
+		}
+		return binary;
+		
 	}
 
 }

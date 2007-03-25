@@ -26,11 +26,11 @@ public class JointTlb extends AbstractTlb {
 	public void store(Word data, int position) {
 		tlb[position].load(data);
 	}
-
-	public void store(Word data) {
-		store(data, (int) Math.random() % size);
+	
+	public Word get(int position){
+		return tlb[position].getWord();
 	}
-
+	
 	public int translate(int virtualAddress, int asid, boolean writting)
 			throws EntryNotFoundException, IllegalMemoryAccessException,
 			TlbInvalidException, TlbDirtyException, NotCachableException {
@@ -85,10 +85,8 @@ public class JointTlb extends AbstractTlb {
 
 	}
 
-	public int getPfn(int virtualAddress) {
-		Word virtualAddressWord = Word.getQuadWord();
-		virtualAddressWord.setValue(virtualAddress);
-		int vpn = virtualAddressWord.getBitsIntValue(13, 20);
+	private int getPfn(Word virtualAddressWord) {
+		int vpn = virtualAddressWord.getBitsIntValue(12, 20);
 		int entryIndex = -1;
 		boolean evenPage = false;
 		for (int i = 0; i < size; i++) {
@@ -101,6 +99,17 @@ public class JointTlb extends AbstractTlb {
 		}
 		JointTlbEntry entry = tlb[entryIndex];
 		return evenPage ? entry.getPfn2() : entry.getPfn1();
+	}
+	
+	public int getRealPfn(int virtualAddress) {
+		Word virtualAddressWord = Word.getQuadWord();
+		virtualAddressWord.setValue(virtualAddress);
+		int pfn = getPfn(virtualAddressWord); 
+		int subPage = virtualAddressWord.getBitsIntValue(12, 20);
+		String binary = Integer.toBinaryString(pfn) + 
+				Integer.toBinaryString(subPage);
+		
+		return Integer.parseInt(binary, 2);		
 	}
 
 }

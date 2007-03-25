@@ -2,7 +2,7 @@ package ro.utcluj.dandanciu.nachos.machine.vm;
 
 import ro.utcluj.dandanciu.nachos.machine.Word;
 
-public class MiniTlbEntry {
+public class MiniTlbEntry extends TlbEntry{
 
 	/**
 	 * 
@@ -58,6 +58,20 @@ public class MiniTlbEntry {
 		cachable = (data.getBitsIntValue(2, 1) == 0);
 		dirty = (data.getBitsIntValue(1, 1) == 0);
 		valid = (data.getBitsIntValue(0, 1) == 0);
+	}
+	
+	public Word getWord(){
+		String binary = "";
+		binary = valid ? "1" : "0";
+		binary = dirty ? "1" : "0" + binary;
+		binary = cachable ? "1" : "0" + binary;
+		binary = Word.toBinary(vfn, 20) + binary;
+		binary = global ? "1" : "0" + binary;
+		binary = Word.toBinary(asid, 8) + binary;
+		
+		Word word = Word.getQuadWord();
+		word .setValue(Integer.parseInt(binary, 2));
+		return word;
 	}
 
 	/**
