@@ -10,7 +10,7 @@ package ro.utcluj.dandanciu.nachos.machine.vm;
  */
 public abstract class AbstractTlb implements TranslationLookasideBuffer {
 
-	protected int size;
+	protected final int size;
 
 	public AbstractTlb(int size) {
 		super();

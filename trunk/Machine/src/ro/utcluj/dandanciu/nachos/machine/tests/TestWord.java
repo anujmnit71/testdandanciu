@@ -23,6 +23,10 @@ public class TestWord extends TestCase {
 		
 		assertEquals(255, 0xFF);
 		
+		System.out.println(word);
+		System.out.println(word2);
+		System.out.println(word3);
+		
 	}
 	
 	public void testMaxSize() throws IllegalWordSizeException{

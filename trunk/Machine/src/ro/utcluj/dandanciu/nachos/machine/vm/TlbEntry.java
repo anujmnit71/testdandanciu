@@ -10,7 +10,7 @@ import ro.utcluj.dandanciu.nachos.machine.Word;
  * 
  */
 public abstract class TlbEntry {
-
+	
 	/**
 	 * Loads the data from the given word into the specified entry
 	 * 
@@ -18,5 +18,7 @@ public abstract class TlbEntry {
 	 * @param entry
 	 */
 	abstract void load(Word data);
+	
+	abstract Word getWord();
 
 }

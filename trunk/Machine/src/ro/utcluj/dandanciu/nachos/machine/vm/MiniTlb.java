@@ -6,14 +6,18 @@ import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.IllegalMemoryAccessExcep
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.NotCachableException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.TlbDirtyException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.TlbInvalidException;
+import ro.utcluj.dandanciu.utils.collections.LastRecentlyUsed;
 
 public class MiniTlb extends AbstractTlb {
 
 	MiniTlbEntry[] tlb;
+	
+	private LastRecentlyUsed lru;
 
 	public MiniTlb(int size) {
 		super(size);
 		tlb = new MiniTlbEntry[size];
+		lru = new LastRecentlyUsed(size);
 	}
 
 	public int translate(int virtualAddress, int asid, boolean writting)
@@ -23,8 +27,10 @@ public class MiniTlb extends AbstractTlb {
 		Word virtualAddressWord = Word.getQuadWord();
 		virtualAddressWord.setValue(virtualAddress);
 		int index = virtualAddressWord.getBitsIntValue(0, 12);
-		int entryIndex = getEntryFor(virtualAddress);
+		int vpn = virtualAddressWord.getBitsIntValue(12, 20);
+		int entryIndex = getEntryFor(vpn);
 		MiniTlbEntry entry = tlb[entryIndex];
+		lru.use(entryIndex);
 
 		if ((entry == null) || (!entry.isGlobal() && entry.getAsid() != asid)) {
 			throw new EntryNotFoundException();
@@ -47,8 +53,8 @@ public class MiniTlb extends AbstractTlb {
 		tlb[position].load(data);
 	}
 
-	public void store(Word data) {
-		store(data, (int) Math.random() % size);
+	public Word get(int position){
+		return tlb[position].getWord();
 	}
 
 	public void setDirty(int virtualAddress) {
@@ -67,4 +73,22 @@ public class MiniTlb extends AbstractTlb {
 		return -1;
 	}
 
+	public int getIndexForNew() {
+
+		for(int i = 0; i < size; i++){
+			if(!tlb[i].isValid())
+				return i;
+		}
+		for(int i = 0; i < size; i++){
+			if(!tlb[i].isDirty())
+				return i;
+		}
+		return lru.getLastRecentlyUsed();
+	}
+
+	public int getIndexFor(int virtualAddress) {
+		Word virtualAddressWord = Word.getQuadWord();
+		virtualAddressWord.setValue(virtualAddress);
+		return getEntryFor(virtualAddressWord.getBitsIntValue(12, 20));
+	}
 }

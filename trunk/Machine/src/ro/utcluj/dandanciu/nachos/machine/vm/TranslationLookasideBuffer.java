@@ -21,7 +21,7 @@ public interface TranslationLookasideBuffer {
 			TlbInvalidException, TlbDirtyException, NotCachableException;
 
 	void store(Word data, int position);
-
-	void store(Word data);
+	
+	Word get(int positio);
 
 }

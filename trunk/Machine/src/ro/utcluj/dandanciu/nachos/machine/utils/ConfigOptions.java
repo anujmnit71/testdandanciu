@@ -58,6 +58,12 @@ public class ConfigOptions {
 	public static final byte[] DiskEOF = { 0x55 };
 
 	/**
+	 * Virtual Memory Page Size
+	 * Default value = 4k = 2^12;
+	 */
+	public static final int VMPageSize = 4096;
+
+	/**
 	 * Flag for indecating if we should suspend after each simulate instruction
 	 */
 	public static boolean singleStep = false;

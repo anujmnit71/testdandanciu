@@ -7,15 +7,21 @@ import java.util.List;
 import org.apache.log4j.PropertyConfigurator;
 
 import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
+import ro.utcluj.dandanciu.nachos.machine.vm.GlobalMmu;
+import ro.utcluj.dandanciu.nachos.machine.vm.MemoryConfigOptions;
+import ro.utcluj.dandanciu.nachos.machinetoos.MemoryManagementUnit;
 
 public class Machine {
+
+	private ClockGenerator clockGenerator;
+
 	private static List<Processor> processors;
 
 	private Memory mainMemory;
 
-	private ClockGenerator clockGenerator;
-
 	private IOApic ioApic;
+
+	private GlobalMmu mmu;
 
 	private static Machine machine;
 
@@ -34,8 +40,11 @@ public class Machine {
 		}
 
 		// initialize the main memory
-		mainMemory = new Memory(4, 4, 128);
+		mainMemory = new Memory(MemoryConfigOptions.MEM_ADDRESS_SIZE,
+				MemoryConfigOptions.MEM_DATA_SIZE, MemoryConfigOptions.MEM_SIZE);
 		mainMemory.clean();
+
+		mmu = new GlobalMmu(processors, mainMemory);
 
 	}
 
@@ -64,6 +73,10 @@ public class Machine {
 	public void reset() {
 		// TODO reset the machine
 
+	}
+	
+	public MemoryManagementUnit getMmu(){
+		return mmu;
 	}
 
 }
