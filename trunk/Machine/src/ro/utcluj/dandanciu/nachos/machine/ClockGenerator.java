@@ -5,7 +5,7 @@ import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
-import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
+import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 
 public class ClockGenerator extends Timer {
 	/**
