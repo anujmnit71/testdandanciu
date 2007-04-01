@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.PropertyConfigurator;
 
-import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
+import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.machine.vm.GlobalMmu;
 import ro.utcluj.dandanciu.nachos.machine.vm.MemoryConfigOptions;
 import ro.utcluj.dandanciu.nachos.machinetoos.MemoryManagementUnit;

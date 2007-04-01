@@ -1,8 +1,8 @@
 package ro.utcluj.dandanciu.nachos.machine;
 
+import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
+import ro.utcluj.dandanciu.nachos.common.Constants;
 import ro.utcluj.dandanciu.nachos.machine.exceptions.IllegalWordSizeException;
-import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
-import ro.utcluj.dandanciu.nachos.machine.utils.Constants;
 import ro.utcluj.dandanciu.nachos.machine.vm.LocalMemoryManagementUnit;
 import ro.utcluj.dandanciu.nachos.machine.vm.MemoryConfigOptions;
 

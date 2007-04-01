@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.machine.Memory;
 import ro.utcluj.dandanciu.nachos.machine.PhysicalException;
 import ro.utcluj.dandanciu.nachos.machine.Processor;
 import ro.utcluj.dandanciu.nachos.machine.Word;
 import ro.utcluj.dandanciu.nachos.machine.exceptions.IllegalWordSizeException;
-import ro.utcluj.dandanciu.nachos.machine.utils.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.EntryNotFoundException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.IllegalMemoryAccessException;
 import ro.utcluj.dandanciu.nachos.machine.vm.exceptions.NotCachableException;
