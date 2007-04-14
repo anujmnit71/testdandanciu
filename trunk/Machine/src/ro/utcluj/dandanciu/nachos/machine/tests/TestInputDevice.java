@@ -18,7 +18,7 @@ public class TestInputDevice extends TestCase {
 
 	public void setUp() {
 		if (logger.isDebugEnabled()) {
-			logger.debug("setUp() - start"); //$NON-NLS-1$
+			logger.debug("setUp() - start"); 
 		}
 
 		PropertyConfigurator.configure("log4j.properties");
@@ -27,13 +27,13 @@ public class TestInputDevice extends TestCase {
 		da.init(id);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("setUp() - end"); //$NON-NLS-1$
+			logger.debug("setUp() - end"); 
 		}
 	}
 	
 	public void testID(){
 		if (logger.isDebugEnabled()) {
-			logger.debug("testID() - start"); //$NON-NLS-1$
+			logger.debug("testID() - start"); 
 		}
 		
 		id.addChar('A');
@@ -45,7 +45,7 @@ public class TestInputDevice extends TestCase {
 		System.out.println(id.getChar());
 		
 		if (logger.isDebugEnabled()) {
-			logger.debug("testID() - end"); //$NON-NLS-1$
+			logger.debug("testID() - end"); 
 		}
 	}
 }

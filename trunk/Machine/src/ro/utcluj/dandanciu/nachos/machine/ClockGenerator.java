@@ -18,7 +18,7 @@ public class ClockGenerator extends Timer {
 		@Override
 		public void run() {
 			if (logger.isDebugEnabled()) {
-				logger.debug("ClockGeneratorTask.run() - start"); //$NON-NLS-1$
+				logger.debug("ClockGeneratorTask.run() - start"); 
 			}
 
 			Machine.getInstance().tick();
@@ -27,7 +27,7 @@ public class ClockGenerator extends Timer {
 			schedule();
 
 			if (logger.isDebugEnabled()) {
-				logger.debug("ClockGeneratorTask.run() - end"); //$NON-NLS-1$
+				logger.debug("ClockGeneratorTask.run() - end"); 
 			}
 		}
 		void schedule() {
@@ -39,13 +39,13 @@ public class ClockGenerator extends Timer {
 	public ClockGenerator() {
 		super();
 		if (logger.isDebugEnabled()) {
-			logger.debug("ClockGenerator() - start"); //$NON-NLS-1$
+			logger.debug("ClockGenerator() - start"); 
 		}
 
 		new ClockGeneratorTask().schedule();
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("ClockGenerator() - end"); //$NON-NLS-1$
+			logger.debug("ClockGenerator() - end"); 
 		}
 	}
 
