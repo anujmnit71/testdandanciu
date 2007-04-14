@@ -16,7 +16,7 @@ public enum KernelCallType {
 	 
 	  SYS_KILL,			//Send signal to a process after KILL call
 	 
-	  SYS_GETKSIG,		//PM is checking for pending signals
+	  SYS_GETKSIG,		//Process manager (PM) is checking for pending signals
 	 
 	  SYS_ENDKSIG, 		//PM has finished processing signal
 	 
@@ -56,5 +56,8 @@ public enum KernelCallType {
 	 
 	  SYS_ABORT,		//Panic: MINIX is unable to continue
 	 
-	  SYS_GETINFO		//Request system information
+	  SYS_GETINFO,		//Request system information
+	  
+	  SYS_TSL			//Test and set latch instruction, 
+	  					//this ensure that the code about to be executed will not be interrupted
 }

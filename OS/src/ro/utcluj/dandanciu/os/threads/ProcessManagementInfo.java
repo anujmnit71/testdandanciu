@@ -59,6 +59,27 @@ public class ProcessManagementInfo {
 	 * Effective GID
 	 */
 	private int gid;
+	
+	/**
+	 * Thread efective priority, this is used for scheduling
+	 * When there are threads blocked after this thread if their 
+	 * priority is greater than its own, the thread borrows the priotity
+	 */
+	private int efectivePriority = 0;
+
+	/**
+	 * @return the efectivePriority
+	 */
+	public int getEfectivePriority() {
+		return efectivePriority;
+	}
+
+	/**
+	 * @param efectivePriority the efectivePriority to set
+	 */
+	public void setEfectivePriority(int efectivePriority) {
+		this.efectivePriority = efectivePriority;
+	}
 
 	/**
 	 * @return the childrensTicks

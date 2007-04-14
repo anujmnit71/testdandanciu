@@ -1,5 +1,6 @@
 package ro.utcluj.dandanciu.os.threads;
 
+
 /**
  * 
  * Message type From Meaning
@@ -62,35 +63,94 @@ package ro.utcluj.dandanciu.os.threads;
  * 
  * 
  * @author Dan Danciu
- * 
+ *
  */
 public class SystemTask {
 	
+	public SystemTask(){
+		setUp();
+	}
+
+	private void setUp() {
+		kernelCalls = new KernelCall[KernelCallType.values().length];
+		
+		setKernelCall(KernelCallType.SYS_TSL, new KernelCall() {
+			public synchronized Object call(Object[] params) {
+				Boolean value = ((Boolean) params[0]);
+				if (value)
+					return Boolean.FALSE;
+				value = true;
+				return Boolean.TRUE;
+			}
+		});
+		
+		/**
+		 * Makes the fork call to the Kernel
+		 */
+		setKernelCall(KernelCallType.SYS_FORK, new KernelCall() {
+			
+			/**
+			 * Implementation of the fork call to the kernel
+			 *@param params array of Objects, param[0] - the forking thread
+			 * and param[1] - the thread from which the fork is being 
+			 * done
+			 * @return Returns <code>null</code> no matter what 
+			 */
+			public Object call(Object[] params) {
+				//implement fork kernel call
+				Kernel.fork((XThreadAbstract)params[0], (XThreadAbstract)params[1]);
+				return null;
+			}
+		});
+		
+		setKernelCall(KernelCallType.SYS_SETALARM, new KernelCall() {
+
+			public Object call(Object[] params) {
+				Kernel.getKernel().getClockTask().addAlarm(
+						((Long) params[0]).longValue(), 
+						(Runnable) params[1]);
+				return null;
+			}
+			
+		});
+		
+	}
+
 	/**
 	 * The array of kernel call.
 	 */
-	  private static KernelCall[] kernelCalls = new KernelCall[KernelCallType.values().length];
-	  
-	  /**
-	   * Set a kernel call method
-	   * @param type which kernel call we want to change
-	   * @param call the new kernel call we want to set
-	   * @return the old kernel call, the one we are replacing
-	   */
-	  public KernelCall setKernelCall(KernelCallType type, KernelCall call) {
-		  KernelCall old = kernelCalls[type.ordinal()];
-		  kernelCalls[type.ordinal()] = call;
-		  return old;
-	  }
-	  
-	  /**
-	   * Make a kernel call
-	   * @param type which kernel call we are making
-	   * @param params the array of parameters
-	   * @return the return value of the kernel call
-	   */
-	  public Object kernellCall(KernelCallType type, Object[] params) {
-		  return kernelCalls[type.ordinal()].call(params);
-	  }
+	private KernelCall[] kernelCalls;
+
+	/**
+	 * Set a kernel call method
+	 * 
+	 * @param type
+	 *            which kernel call we want to change
+	 * @param call
+	 *            the new kernel call we want to set
+	 * @return the old kernel call, the one we are replacing
+	 */
+	public KernelCall setKernelCall(KernelCallType type, KernelCall call) {
+		KernelCall old = kernelCalls[type.ordinal()];
+		kernelCalls[type.ordinal()] = call;
+		return old;
+	}
+
+	/**
+	 * Make a kernel call
+	 * 
+	 * @param type
+	 *            which kernel call we are making
+	 * @param params
+	 *            the array of parameters
+	 * @return the return value of the kernel call
+	 */
+	public Object kernellCall(KernelCallType type, Object[] params) {
+		return kernelCalls[type.ordinal()].call(params);
+	}
+	
+	public static SystemTask getInstance(){
+		return Kernel.getKernel().getSystemTask();
+	}
 
 }
