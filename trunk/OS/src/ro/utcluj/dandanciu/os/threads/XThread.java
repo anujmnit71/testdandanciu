@@ -2,14 +2,14 @@ package ro.utcluj.dandanciu.os.threads;
 
 public interface XThread extends Runnable{
 	
-	void fork(Runnable runnable);
+	<T extends XThread> void fork(T current);
 	
 	void finish();
 	
-	void yeld();
+	void yield();
 	
-	void sleep();
+	void sleep(long ticks);
 	
-	void join();
+	<T extends XThread> void join(T current);
 
 }

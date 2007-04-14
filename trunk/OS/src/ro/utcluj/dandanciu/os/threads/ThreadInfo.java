@@ -24,9 +24,11 @@ public class ThreadInfo {
 	 */
 	private ThreadState state = ThreadState.UNKNOWN;
 	/**
-	 * Current scheduling priority
+	 * Thread scheduling priority
 	 */
 	private int priority = 0;
+	
+	
 	/**
 	 * Maximum scheduling priority
 	 */
@@ -197,7 +199,4 @@ public class ThreadInfo {
 	public void setUsedTicks(int usedTicks) {
 		this.usedTicks = usedTicks;
 	}
-	
-	
-
 }

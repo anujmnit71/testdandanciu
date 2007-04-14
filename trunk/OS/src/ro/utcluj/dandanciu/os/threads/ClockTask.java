@@ -4,8 +4,6 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import ro.utcluj.dandanciu.os.utils.OsConfigOptions;
-
 public class ClockTask {
 	/**
 	 * Holds the current time in ticks.
@@ -32,7 +30,7 @@ public class ClockTask {
 	 * 
 	 */
 	private class AlarmEntry implements Comparable<AlarmEntry> {
-		public int timeLeft;
+		public long timeLeft;
 		public Runnable target;
 		
 		public int compareTo(AlarmEntry arg0) {
@@ -51,7 +49,8 @@ public class ClockTask {
 	public static void doHandle() {
 		//adjust realtime
 		realtime++;
-		//increment the current thread's ticks
+		//increment the current thread's ticks, also will check if any of 
+		//the threads should be switched
 		//TODO: SystemTask.incrementThreadsTicks
 		
 		/*
@@ -65,15 +64,6 @@ public class ClockTask {
 		} else {
 			first.timeLeft--;
 		}
-		
-		/*
-		 * Chech if the process scheduler should be notified
-		 */
-		if(realtime == next_switching) {
-			next_switching += OsConfigOptions.ThreadQuantom;
-			//TODO: SystemTask.switch
-		}
-	
 	}
 	
 	public static void reset() {
@@ -88,7 +78,7 @@ public class ClockTask {
 	 * @param offset the number of ticks to wait to triger the target
 	 * @param target the target to be run
 	 */
-	void addAlarm(int offset, Runnable target) {
+	public void addAlarm(long offset, Runnable target) {
 		AlarmEntry entry = new AlarmEntry();
 		Iterator<AlarmEntry> it = alarms.iterator();
 		/*
