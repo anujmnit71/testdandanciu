@@ -15,19 +15,19 @@ public class TestHarddisk extends TestCase {
 	
 	public void setUp(){
 		if (logger.isDebugEnabled()) {
-			logger.debug("setUp() - start"); //$NON-NLS-1$
+			logger.debug("setUp() - start"); 
 		}
 
 		PropertyConfigurator.configure("log4j.properties");
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("setUp() - end"); //$NON-NLS-1$
+			logger.debug("setUp() - end"); 
 		}
 	}
 	
 	public void testCreate() {
 		if (logger.isDebugEnabled()) {
-			logger.debug("testCreate() - start"); //$NON-NLS-1$
+			logger.debug("testCreate() - start"); 
 		}
 
 		HardDisk disk = new HardDisk("testHard.data", null, -1);
@@ -45,7 +45,7 @@ public class TestHarddisk extends TestCase {
 		assertEquals(testString, newString);
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("testCreate() - end"); //$NON-NLS-1$
+			logger.debug("testCreate() - end"); 
 		}
 	}
 

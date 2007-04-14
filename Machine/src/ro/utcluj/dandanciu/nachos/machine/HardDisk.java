@@ -51,7 +51,7 @@ public class HardDisk extends Device implements Runnable {
 			support.write(ConfigOptions.DiskEOF); 
 
 		} catch (Exception e) {
-			logger.error("HardDisk(String)", e); //$NON-NLS-1$
+			logger.error("HardDisk(String)", e); 
 
 			assert (false); // we cann't get here, if we did IT IS BAD!
 		}
@@ -68,7 +68,7 @@ public class HardDisk extends Device implements Runnable {
 	 */
 	public void readRequest(int sectorNumber, int index) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("readRequest(int, int) - start"); //$NON-NLS-1$
+			logger.debug("readRequest(int, int) - start"); 
 		}
 
 		assert (!active); // only one request at a time
@@ -91,19 +91,19 @@ public class HardDisk extends Device implements Runnable {
 			this.buffer = data;
 
 		} catch (Exception e) {
-			logger.error("readRequest(int, int)", e); //$NON-NLS-1$
+			logger.error("readRequest(int, int)", e); 
 
 			assert (false);
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("readRequest(int, int) - end"); //$NON-NLS-1$
+			logger.debug("readRequest(int, int) - end"); 
 		}
 	}
 
 	public void writeRequest(int sectorNumber, int index) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("writeRequest(int, int) - start"); //$NON-NLS-1$
+			logger.debug("writeRequest(int, int) - start"); 
 		}
 
 		assert (!active);
@@ -125,24 +125,24 @@ public class HardDisk extends Device implements Runnable {
 			active = true;
 		
 		} catch (Exception e) {
-			logger.error("writeRequest(int, int)", e); //$NON-NLS-1$
+			logger.error("writeRequest(int, int)", e); 
 
 			assert (false);
 		}
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("writeRequest(int, int) - end"); //$NON-NLS-1$
+			logger.debug("writeRequest(int, int) - end"); 
 		}
 	}
 
 	private int getNumberOfSectors() {
 		if (logger.isDebugEnabled()) {
-			logger.debug("getNumberOfSectors() - start"); //$NON-NLS-1$
+			logger.debug("getNumberOfSectors() - start"); 
 		}
 
 		int returnint = traks * ConfigOptions.DiskNoOfSectorsPerTrack;
 		if (logger.isDebugEnabled()) {
-			logger.debug("getNumberOfSectors() - end"); //$NON-NLS-1$
+			logger.debug("getNumberOfSectors() - end"); 
 		}
 		return returnint;
 	}
@@ -153,12 +153,12 @@ public class HardDisk extends Device implements Runnable {
 	 */
 	private int getSize() {
 		if (logger.isDebugEnabled()) {
-			logger.debug("getSize() - start"); //$NON-NLS-1$
+			logger.debug("getSize() - start"); 
 		}
 
 		int returnint = ConfigOptions.DiskFileTypeIdSize + traks * ConfigOptions.DiskNoOfSectorsPerTrack * ConfigOptions.DiskSizeOfSector;
 		if (logger.isDebugEnabled()) {
-			logger.debug("getSize() - end"); //$NON-NLS-1$
+			logger.debug("getSize() - end"); 
 		}
 		return returnint;
 	}
@@ -176,7 +176,7 @@ public class HardDisk extends Device implements Runnable {
 	 */
 	private int computeLatency(int newSector) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("computeLatency(int) - start"); //$NON-NLS-1$
+			logger.debug("computeLatency(int) - start"); 
 		}
 
 		int seek = timeToSeek(newSector); // computes seek and rotation
@@ -189,7 +189,7 @@ public class HardDisk extends Device implements Runnable {
 
 		int returnint = (timeToChangeTrack + seek);
 		if (logger.isDebugEnabled()) {
-			logger.debug("computeLatency(int) - end"); //$NON-NLS-1$
+			logger.debug("computeLatency(int) - end"); 
 		}
 		return returnint;
 	}
@@ -204,7 +204,7 @@ public class HardDisk extends Device implements Runnable {
 	 */
 	private int timeToSeek(int newSector) {
 		if (logger.isDebugEnabled()) {
-			logger.debug("timeToSeek(int) - start"); //$NON-NLS-1$
+			logger.debug("timeToSeek(int) - start"); 
 		}
 
 		int newTrack = newSector / ConfigOptions.DiskNoOfSectorsPerTrack;
@@ -216,7 +216,7 @@ public class HardDisk extends Device implements Runnable {
 					* ConfigOptions.DiskSeekTime;
 
 		if (logger.isDebugEnabled()) {
-			logger.debug("timeToSeek(int) - end"); //$NON-NLS-1$
+			logger.debug("timeToSeek(int) - end"); 
 		}
 		return seek;
 	}
