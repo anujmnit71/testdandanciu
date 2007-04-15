@@ -8,6 +8,8 @@ import java.util.List;
 
 import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
+import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
+import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
 
 /**
  * @author Dan Danciu
@@ -33,10 +35,7 @@ public abstract class XThreadAbstract implements XThread {
 	 *
 	 */
 	public XThreadAbstract(){
-		info = new ThreadInfo("Unknown");
-		info.setRegisters(new int[ConfigOptions.NoOfRegisters]);
-		info.setState(ThreadState.CREATED);
-		
+		info = null; //not here, but in Kernel.fork
 		addressSpace = new AddressSpace();
 	}
 

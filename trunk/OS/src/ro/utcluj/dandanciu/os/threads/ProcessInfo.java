@@ -1,9 +1,11 @@
 package ro.utcluj.dandanciu.os.threads;
 
+import java.util.ArrayList;
+
 
 public class ProcessInfo {
 	
-	private ThreadInfo threadInfo;
+	private ArrayList<ThreadInfo> threadInfos;
 	
 	private ProcessManagementInfo processManagementInfo;
 	
@@ -38,21 +40,29 @@ public class ProcessInfo {
 	}
 
 	/**
-	 * @return the threadInfo
+	 * Return the thread info with a certain id.
+	 * @param id the thread id
+	 * @return the threadInfo with the specified id, if no such thread exists 
+	 * in this proccess then we return null
 	 */
-	public ThreadInfo getThreadInfo() {
-		return threadInfo;
+	public ThreadInfo getThreadInfobyThreadId(int id) {
+		for(ThreadInfo info : threadInfos) {
+			if(info.getThreadId() == id)
+				return info;
+		}
+		return null;
 	}
 
 	/**
 	 * @param threadInfo the threadInfo to set
 	 */
-	public void setThreadInfo(ThreadInfo threadInfo) {
-		this.threadInfo = threadInfo;
+	public void addThreadInfo(ThreadInfo threadInfo) {
+		this.threadInfos.add(threadInfo);
 	}
-	
-	
-	
-	
 
+	public ProcessInfo() {
+		threadInfos = new ArrayList<ThreadInfo>();
+		processManagementInfo = new ProcessManagementInfo();
+		fileManagementInfo = new FileManagementInfo();
+	}
 }

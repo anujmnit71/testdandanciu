@@ -1,4 +1,10 @@
-package ro.utcluj.dandanciu.os.threads;
+package ro.utcluj.dandanciu.os.threads.tasks;
+
+import ro.utcluj.dandanciu.os.threads.Kernel;
+import ro.utcluj.dandanciu.os.threads.KernelCall;
+import ro.utcluj.dandanciu.os.threads.KernelCallType;
+import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
+import ro.utcluj.dandanciu.os.threads.structs.TimeInfo;
 
 
 /**
@@ -57,7 +63,7 @@ package ro.utcluj.dandanciu.os.threads;
  * 
  * sys_setalarm PM, FS, Drivers Schedule a synchronous alarm
  * 
- * sys_abort PM, TTY Panic: MINIX is unable to continue
+ * sys_abort PM, TTY Panic: OS is unable to continue
  * 
  * sys_getinfo Any Request system information
  * 
@@ -98,7 +104,7 @@ public class SystemTask {
 			 */
 			public Object call(Object[] params) {
 				//implement fork kernel call
-				Kernel.fork((XThreadAbstract)params[0], (XThreadAbstract)params[1]);
+				Kernel.getKernel().fork((XThreadAbstract)params[0], (XThreadAbstract)params[1]);
 				return null;
 			}
 		});
@@ -112,6 +118,22 @@ public class SystemTask {
 				return null;
 			}
 			
+		});
+		
+		setKernelCall(KernelCallType.SYS_TIMES, new KernelCall() {
+			public Object call(Object[] params) {
+				TimeInfo ti = new TimeInfo();
+				ti.ticks = ClockTask.getRealtime();
+				return ti;
+			}
+		});
+		
+		setKernelCall(KernelCallType.SYS_ABORT, new KernelCall() {
+			public Object call(Object[] params) {
+				Kernel.getKernel().panic();
+				//normally we shoulds get here, panic should terminate everything
+				return null;
+			}
 		});
 		
 	}

@@ -1,7 +1,12 @@
-package ro.utcluj.dandanciu.os.threads;
+package ro.utcluj.dandanciu.os.threads.servers;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
+
+import ro.utcluj.dandanciu.os.threads.KernelCallType;
+import ro.utcluj.dandanciu.os.threads.ProcessManagementInfo;
+import ro.utcluj.dandanciu.os.threads.XThread;
+import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
 
 public class ProcessManager {
 	
