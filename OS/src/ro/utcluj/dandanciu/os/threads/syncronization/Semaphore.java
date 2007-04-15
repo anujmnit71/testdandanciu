@@ -5,8 +5,8 @@ import org.apache.log4j.Logger;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import ro.utcluj.dandanciu.os.threads.ProcessManager;
 import ro.utcluj.dandanciu.os.threads.XThread;
+import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
 
 public class Semaphore {
 	/**

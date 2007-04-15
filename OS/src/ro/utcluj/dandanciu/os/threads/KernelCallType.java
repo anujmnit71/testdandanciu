@@ -54,7 +54,7 @@ public enum KernelCallType {
 	 
 	  SYS_SETALARM,	//Schedule a synchronous alarm
 	 
-	  SYS_ABORT,		//Panic: MINIX is unable to continue
+	  SYS_ABORT,		//Panic: OS is unable to continue
 	 
 	  SYS_GETINFO,		//Request system information
 	  

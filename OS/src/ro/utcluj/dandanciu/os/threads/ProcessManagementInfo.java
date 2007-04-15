@@ -24,16 +24,17 @@ public class ProcessManagementInfo {
 	/**
 	 * Process ID (PID)
 	 */
+	private int processId;
 	
 	/**
 	 * Parent process PID
 	 */
-	private int pid;
+	private int parentId;
 	
 	/**
 	 * Process group (GID)
 	 */
-	private int group;
+	private int groupId;
 	
 	/**
 	 * Children's CPU time
@@ -43,22 +44,22 @@ public class ProcessManagementInfo {
 	/**
 	 * Real UID
 	 */
-	private int realUid;
+	private int userId;
 	
 	/**
 	 * Effective UID
 	 */
-	private int uid;
+	private int effectiveUserId;
 	
 	/**
 	 * Real GID
 	 */
-	private int realGid;
+	private int userGroupId;
 	
 	/**
 	 * Effective GID
 	 */
-	private int gid;
+	private int effectiveUserGroupId;
 	
 	/**
 	 * Thread efective priority, this is used for scheduling
@@ -66,20 +67,6 @@ public class ProcessManagementInfo {
 	 * priority is greater than its own, the thread borrows the priotity
 	 */
 	private int efectivePriority = 0;
-
-	/**
-	 * @return the efectivePriority
-	 */
-	public int getEfectivePriority() {
-		return efectivePriority;
-	}
-
-	/**
-	 * @param efectivePriority the efectivePriority to set
-	 */
-	public void setEfectivePriority(int efectivePriority) {
-		this.efectivePriority = efectivePriority;
-	}
 
 	/**
 	 * @return the childrensTicks
@@ -96,98 +83,114 @@ public class ProcessManagementInfo {
 	}
 
 	/**
-	 * @return the gid
+	 * @return the efectivePriority
 	 */
-	public int getGid() {
-		return gid;
+	public int getEfectivePriority() {
+		return efectivePriority;
 	}
 
 	/**
-	 * @param gid the gid to set
+	 * @param efectivePriority the efectivePriority to set
 	 */
-	public void setGid(int gid) {
-		this.gid = gid;
+	public void setEfectivePriority(int efectivePriority) {
+		this.efectivePriority = efectivePriority;
 	}
 
 	/**
-	 * @return the group
+	 * @return the effectiveUserGroupId
 	 */
-	public int getGroup() {
-		return group;
+	public int getEffectiveUserGroupId() {
+		return effectiveUserGroupId;
 	}
 
 	/**
-	 * @param group the group to set
+	 * @param effectiveUserGroupId the effectiveUserGroupId to set
 	 */
-	public void setGroup(int group) {
-		this.group = group;
+	public void setEffectiveUserGroupId(int effectiveUserGroupId) {
+		this.effectiveUserGroupId = effectiveUserGroupId;
 	}
 
 	/**
-	 * @return the pid
+	 * @return the efFectiveUserId
 	 */
-	public int getPid() {
-		return pid;
+	public int getEffectiveUserId() {
+		return effectiveUserId;
 	}
 
 	/**
-	 * @param pid the pid to set
+	 * @param efFectiveUserId the efFectiveUserId to set
 	 */
-	public void setPid(int pid) {
-		this.pid = pid;
+	public void setEffectiveUserId(int efFectiveUserId) {
+		this.effectiveUserId = efFectiveUserId;
 	}
 
 	/**
-	 * @return the realGid
+	 * @return the groupId
 	 */
-	public int getRealGid() {
-		return realGid;
+	public int getGroupId() {
+		return groupId;
 	}
 
 	/**
-	 * @param realGid the realGid to set
+	 * @param groupId the groupId to set
 	 */
-	public void setRealGid(int realGid) {
-		this.realGid = realGid;
+	public void setGroupId(int groupId) {
+		this.groupId = groupId;
 	}
 
 	/**
-	 * @return the realUid
+	 * @return the parentId
 	 */
-	public int getRealUid() {
-		return realUid;
+	public int getParentId() {
+		return parentId;
 	}
 
 	/**
-	 * @param realUid the realUid to set
+	 * @param parentId the parentId to set
 	 */
-	public void setRealUid(int realUid) {
-		this.realUid = realUid;
+	public void setParentId(int parentId) {
+		this.parentId = parentId;
 	}
 
 	/**
-	 * @return the uid
+	 * @return the processId
 	 */
-	public int getUid() {
-		return uid;
+	public int getProcessId() {
+		return processId;
 	}
 
 	/**
-	 * @param uid the uid to set
+	 * @param processId the processId to set
 	 */
-	public void setUid(int uid) {
-		this.uid = uid;
+	public void setProcessId(int processId) {
+		this.processId = processId;
 	}
-	
+
 	/**
-	 * File info for sharing text
+	 * @return the userGroupId
 	 */
-	
+	public int getUserGroupId() {
+		return userGroupId;
+	}
+
 	/**
-	 * Bitmaps for signals
+	 * @param userGroupId the userGroupId to set
 	 */
-	
+	public void setUserGroupId(int userGroupId) {
+		this.userGroupId = userGroupId;
+	}
+
 	/**
-	 * Various flag bits
+	 * @return the userId
 	 */
+	public int getUserId() {
+		return userId;
+	}
+
+	/**
+	 * @param userId the userId to set
+	 */
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
 }

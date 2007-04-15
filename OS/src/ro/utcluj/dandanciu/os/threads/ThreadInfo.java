@@ -1,6 +1,10 @@
 package ro.utcluj.dandanciu.os.threads;
 
 public class ThreadInfo {
+	
+	private int threadId;
+	
+	private int processId;
 
 	/**
 	 * Registers
@@ -56,8 +60,8 @@ public class ThreadInfo {
 	 */
 	private String name;
 	
-	public ThreadInfo(String name) {
-		this.name = name;
+	public ThreadInfo(int id) {
+		this.threadId = id;
 	}
 
 	/**
@@ -198,5 +202,33 @@ public class ThreadInfo {
 	 */
 	public void setUsedTicks(int usedTicks) {
 		this.usedTicks = usedTicks;
+	}
+
+	/**
+	 * @return the threadId
+	 */
+	public int getThreadId() {
+		return threadId;
+	}
+
+	/**
+	 * @param threadId the threadId to set
+	 */
+	public void setThreadId(int threadId) {
+		this.threadId = threadId;
+	}
+
+	/**
+	 * @return the processId
+	 */
+	public int getProcessId() {
+		return processId;
+	}
+
+	/**
+	 * @param processId the processId to set
+	 */
+	public void setProcessId(int processId) {
+		this.processId = processId;
 	}
 }

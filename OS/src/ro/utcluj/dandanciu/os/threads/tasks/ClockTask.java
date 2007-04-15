@@ -1,4 +1,4 @@
-package ro.utcluj.dandanciu.os.threads;
+package ro.utcluj.dandanciu.os.threads.tasks;
 
 import java.util.Iterator;
 import java.util.SortedSet;
@@ -60,7 +60,7 @@ public class ClockTask {
 		AlarmEntry first = alarms.first();
 		if(first.timeLeft == 0) {
 			alarms.remove(first);
-			//TODO: SystemTask.ready(first.target)			
+			first.target.run();			
 		} else {
 			first.timeLeft--;
 		}
@@ -106,9 +106,11 @@ public class ClockTask {
 			it.next().timeLeft -= offset;
 		}
 	}
-	
-	
-	 
-	
 
+	/**
+	 * @return the realtime
+	 */
+	public static long getRealtime() {
+		return realtime;
+	}
 }
