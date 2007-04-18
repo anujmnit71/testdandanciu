@@ -59,6 +59,11 @@ public class ThreadInfo {
 	 * Process name
 	 */
 	private String name;
+
+	/**
+	 * Thread efective priority, this is used for scheduling When there are threads blocked after this thread if their  priority is greater than its own, the thread borrows the priotity
+	 */
+	private int efectivePriority = 0;
 	
 	public ThreadInfo(int id) {
 		this.threadId = id;
@@ -230,5 +235,19 @@ public class ThreadInfo {
 	 */
 	public void setProcessId(int processId) {
 		this.processId = processId;
+	}
+
+	/**
+	 * @return the efectivePriority
+	 */
+	public int getEfectivePriority() {
+		return efectivePriority;
+	}
+
+	/**
+	 * @param efectivePriority the efectivePriority to set
+	 */
+	public void setEfectivePriority(int efectivePriority) {
+		this.efectivePriority = efectivePriority;
 	}
 }
