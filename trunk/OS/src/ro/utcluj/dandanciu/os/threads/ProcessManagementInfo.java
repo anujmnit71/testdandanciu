@@ -62,13 +62,6 @@ public class ProcessManagementInfo {
 	private int effectiveUserGroupId;
 	
 	/**
-	 * Thread efective priority, this is used for scheduling
-	 * When there are threads blocked after this thread if their 
-	 * priority is greater than its own, the thread borrows the priotity
-	 */
-	private int efectivePriority = 0;
-
-	/**
 	 * @return the childrensTicks
 	 */
 	public int getChildrensTicks() {
@@ -80,20 +73,6 @@ public class ProcessManagementInfo {
 	 */
 	public void setChildrensTicks(int childrensTicks) {
 		this.childrensTicks = childrensTicks;
-	}
-
-	/**
-	 * @return the efectivePriority
-	 */
-	public int getEfectivePriority() {
-		return efectivePriority;
-	}
-
-	/**
-	 * @param efectivePriority the efectivePriority to set
-	 */
-	public void setEfectivePriority(int efectivePriority) {
-		this.efectivePriority = efectivePriority;
 	}
 
 	/**

@@ -3,6 +3,9 @@ package ro.utcluj.dandanciu.os.threads;
 import java.util.ArrayList;
 import java.util.List;
 
+import ro.utcluj.dandanciu.nachos.common.InterruptCode;
+import ro.utcluj.dandanciu.nachos.ostomachine.InterruptServiceTable;
+import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
 import ro.utcluj.dandanciu.os.threads.servers.InformationServer;
 import ro.utcluj.dandanciu.os.threads.tasks.ClockTask;
 import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
@@ -18,7 +21,7 @@ public class Kernel extends XThreadAbstract {
 		
 	}
 
-	private static Kernel kernel = null;
+	private static Kernel kernel;
 
 	private ArrayList<ProcessInfo> processTable;
 	
@@ -50,6 +53,11 @@ public class Kernel extends XThreadAbstract {
 	}
 
 	public static Kernel getKernel() {
+		if(kernel == null) {
+			kernel = new Kernel();
+			kernel.tch = new ThreadContextHelper<XThread>();
+			kernel.tch.start(kernel);
+		}
 		return kernel;
 	}
 
@@ -62,6 +70,7 @@ public class Kernel extends XThreadAbstract {
 		// TASKS
 		systemTask = new SystemTask();
 		clockTask = new ClockTask();
+		initilizeIsrTable();
 
 		// DRIVERS
 
@@ -74,7 +83,7 @@ public class Kernel extends XThreadAbstract {
 		ProcessInfo kInfo = new ProcessInfo();
 		
 		int processId = nextProcessId();
-		kInfo.getProcessManagementInfo().setEfectivePriority(Priority.MAX_PRIORITY);
+		
 		kInfo.getProcessManagementInfo().setProcessId(processId);
 		kInfo.getProcessManagementInfo().setParentId(-1);	//we don't have a parent process
 		kInfo.getProcessManagementInfo().setGroupId(processId);
@@ -89,6 +98,7 @@ public class Kernel extends XThreadAbstract {
 		tInfo.setProcessId(kInfo.getProcessManagementInfo().getProcessId());
 		tInfo.setName("KERNEL v0.1 ALPHA");
 		tInfo.setPriority(Priority.MAX_PRIORITY);
+		tInfo.setEfectivePriority(Priority.MAX_PRIORITY);
 		tInfo.setState(ThreadState.CREATED);
 
 		//TODO: add information for file management
@@ -98,10 +108,16 @@ public class Kernel extends XThreadAbstract {
 		processTable.add(processId, kInfo);
 		
 	}
+	
+	private void initilizeIsrTable(){
+		//TODO add all other service routines 
+		InterruptServiceTable.setInterruptService(InterruptCode.TICK, clockTask);
+	}
 
 	@Override
 	public void run() {
 		initialize();
+		
 	}
 
 	/**
@@ -120,6 +136,7 @@ public class Kernel extends XThreadAbstract {
 		child.info = cInfo;
 		
 		this.processTable.get(pInfo.getProcessId()).addThreadInfo(cInfo);
+		this.threadTable.add(cInfo);
 	}
 	
 	private int nextProcessId() {
@@ -168,5 +185,9 @@ public class Kernel extends XThreadAbstract {
 	public void panic() {
 		assert false;
 		// TODO implement Kernel.panic
+	}
+
+	public ThreadInfo getThreadInfo(int threadId) {
+		return threadTable.get(threadId);
 	}
 }

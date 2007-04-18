@@ -6,7 +6,6 @@ package ro.utcluj.dandanciu.os.threads;
 import java.util.ArrayList;
 import java.util.List;
 
-import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
 import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
 import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
@@ -43,6 +42,10 @@ public abstract class XThreadAbstract implements XThread {
 		this();
 		this.name = name;
 	}
+	
+	public int getThreadId(){
+		return info.getThreadId();
+	}
 
 	/**
 	 * Starts the new XThread. 
@@ -56,15 +59,15 @@ public abstract class XThreadAbstract implements XThread {
 	 *
 	 */
 	public <T extends XThread> void fork(T parent) {
-		info.setState(ThreadState.READY);
 		
 		ProcessManager.enterRegion();
 		SystemTask.getInstance().kernellCall(KernelCallType.SYS_FORK, new Object[] {
 				this, parent
 		});
-		
-		ProcessManager.addReadyThread(this);
-		tch = ThreadContextHelper.getNewThreadContextHelper();
+
+		this.ready();
+		tch = new ThreadContextHelper<XThread>();
+		running();
 		tch.start(this);
 		
 		ProcessManager.exitRegion();
@@ -82,7 +85,7 @@ public abstract class XThreadAbstract implements XThread {
 	public void finish() {
 		
 		for(XThreadAbstract xthread : joinedThreads) {
-			xthread.unblock();
+			xthread.ready();
 		}
 		info.setState(ThreadState.DEAD);
 	}
@@ -103,17 +106,21 @@ public abstract class XThreadAbstract implements XThread {
 		ProcessManager.exitRegion();
 	}
 
+	private void running() {
+		info.setState(ThreadState.RUNNING);
+	}
+
 	private void blocked() {
 		info.setState(ThreadState.BLOCKED);
 	}
 
-	private void unblock() {
+	private void ready() {
 		info.setState(ThreadState.READY);		
 		ProcessManager.addReadyThread(this);
 	}
 
 	public void sleep(long ticks) {
-		info.setState(ThreadState.BLOCKED);
+		
 		ProcessManager.enterRegion();
 		//TODO: add the alarm which will wakeup this thread
 		SystemTask.getInstance().kernellCall(KernelCallType.SYS_SETALARM,
@@ -124,6 +131,9 @@ public abstract class XThreadAbstract implements XThread {
 	    	nextThread.switchFrom(this);
 	    }
 	    ProcessManager.exitRegion();
+	    
+	    info.setState(ThreadState.BLOCKED);
+		tch.yield();
 	}
 
 	/* (non-Javadoc)
@@ -143,10 +153,16 @@ public abstract class XThreadAbstract implements XThread {
 	    ProcessManager.exitRegion();
 	  }
 
-	private void switchFrom(XThreadAbstract previous) {
-		previous.saveContext();
+	public <T extends XThread> void switchFrom(T previous) {
+		((XThreadAbstract) previous).saveContext();
 		this.restoreContext();
-		this.tch.switchContext(previous.tch);
+		this.running();
+		this.tch.switchContext(((XThreadAbstract) previous).tch);
+	}
+	
+	public void resume() {
+		this.running();
+		this.tch.resume();
 	}
 	/**
 	 * Restores the context of the thread.
@@ -182,7 +198,7 @@ public abstract class XThreadAbstract implements XThread {
 		}
 		
 		public void run(){
-			target.unblock();
+			target.ready();
 		}		
 	}
 }

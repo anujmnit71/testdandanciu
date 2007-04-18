@@ -1,11 +1,15 @@
 package ro.utcluj.dandanciu.os.threads.tasks;
 
+import java.util.Arrays;
+
+import org.apache.log4j.Logger;
+
 import ro.utcluj.dandanciu.os.threads.Kernel;
 import ro.utcluj.dandanciu.os.threads.KernelCall;
 import ro.utcluj.dandanciu.os.threads.KernelCallType;
 import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
 import ro.utcluj.dandanciu.os.threads.structs.TimeInfo;
-
+import ro.utcluj.dandanciu.os.threads.util.InfoType;
 
 /**
  * 
@@ -72,6 +76,10 @@ import ro.utcluj.dandanciu.os.threads.structs.TimeInfo;
  *
  */
 public class SystemTask {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(SystemTask.class);
 	
 	public SystemTask(){
 		setUp();
@@ -136,6 +144,17 @@ public class SystemTask {
 			}
 		});
 		
+		setKernelCall(KernelCallType.SYS_GETINFO, new KernelCall() {
+			public Object call(Object[] params) {
+				
+				if(((InfoType)params[0]) ==  InfoType.THREAD) { 
+					return Kernel.getKernel().getThreadInfo((Integer) params[1]);
+				}
+				//TODO add other info request handlers
+				return null;
+			}
+		});
+		
 	}
 
 	/**
@@ -168,6 +187,7 @@ public class SystemTask {
 	 * @return the return value of the kernel call
 	 */
 	public Object kernellCall(KernelCallType type, Object[] params) {
+		logger.debug("KERNEL CALL["+type+"]( "+Arrays.toString(params)+")");
 		return kernelCalls[type.ordinal()].call(params);
 	}
 	
