@@ -1,53 +1,56 @@
 package ro.utcluj.dandanciu.nachos.ostomachine;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
+import ro.utcluj.dandanciu.nachos.common.ProcessorHelper;
 
 public class ThreadContextHelper<T extends Runnable> {
-	
-	private T target;
 	/**
-	 * The id of this ThreadContextHelper
+	 * Logger for this class
 	 */
-	private final int id;
-	
+	private static final Logger logger = Logger.getLogger(ThreadContextHelper.class);
+
+	private T target;
+
 	/**
 	 * A flag showing if this ThreadContextHelper is running or not.
 	 */
 	private boolean running = false;
-	
+
 	/**
 	 * Flag showing if the current thread is done.
 	 */
 	private boolean done = false;
-	
+
 	/**
 	 * Flag showing if the this ThreadContextHelper has a XThread associated.
 	 */
 	private boolean associated = false;
-	
+
 	/**
-	 * Holds a reference to the java thread responsible for running the current <code>T</code> thread
+	 * Holds a reference to the java thread responsible for running the current
+	 * <code>T</code> thread
 	 */
 	private Thread javaThread;
+
+	/**
+	 * Reference to <code>ProcessorHelper<code> class, 
+	 * when this is <code>null<code> this thread is not running
+	 */
+	private ProcessorHelper processorHelper = null;
 	
 	/**
-	 * Holds a reference to all the ThreadContextHelpers currently running in the system.
+	 * We need this because, if this is the first thread we are starting than we
+	 * ca steel the current thread
 	 */
-	private static List<ThreadContextHelper<Runnable>> tchs = new ArrayList<ThreadContextHelper<Runnable>>();
-	
-	static {
-		for(int i = 0; i < ConfigOptions.NoOfProcs; i++) {
-			tchs.add(new ThreadContextHelper<Runnable>(i));
-		}
-	}
-	
-	private ThreadContextHelper(int i) {
-		this.id = i;
-	}
+	private static boolean firstThread = true;
 
+
+	@SuppressWarnings("unchecked")
 	public void start(T target) {
 		
 		assert (!associated);
@@ -56,58 +59,75 @@ public class ThreadContextHelper<T extends Runnable> {
 		
 		this.associated = true;
 		
-		javaThread = new Thread(target);
+		this.processorHelper = ProcessorHelper.getAvailableProcessorHelper();
 		
-		this.running = false;
+		assert (this.processorHelper != null);
 		
-		this.javaThread.start();
+		this.processorHelper.use((ThreadContextHelper<Runnable>) this);
 		
-		this.waitForInterrupt();
-	}
-	
-	private synchronized void waitForInterrupt() {
-		while (!running) {
-		    try { wait(); }
-		    catch (InterruptedException e) { }
+		this.running = true;
+		if(firstThread) {
+			firstThread = false;
+			
+			target.run();
+		} else {
+			javaThread = new Thread(target);
+		
+			this.javaThread.start();
 		}
 	}
-	
+
+	private synchronized void waitForInterrupt() {
+		logger.info("WAIT FOR INTERRUPT");
+		while (!running) {
+			try {
+				wait();
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
 	private synchronized void interrupt() {
-		running = true;
+		this.running = true;
 		notify();
 	}
 
-	
-	public void switchContext(ThreadContextHelper<T> previous) {
-		
-		assert (this.associated);
-		
-		previous.running = false;
-		
-		this.interrupt();
-		previous.yield();		
-	}
-	
 	@SuppressWarnings("unchecked")
-	private void yield() {
+	public void switchContext(ThreadContextHelper<T> previous) {
+
+		assert (this.associated);
+
+		previous.running = false;
+		this.processorHelper = previous.processorHelper;
+		this.processorHelper.use((ThreadContextHelper<Runnable>) this);
+		this.interrupt();
+		previous.yield();
+	}
+
+	@SuppressWarnings("unchecked")
+	public void yield() {
+		this.processorHelper.idle();
+		this.processorHelper = null;
+		this.running = false;
 		waitForInterrupt();
 		
 		if (done) {
-		    tchs.get(id).interrupt();
-		    throw new ThreadDeath();
+			this.interrupt(); //for safety
+			throw new ThreadDeath();
 		}
-
-		tchs.add(id, (ThreadContextHelper<Runnable>) this);
+		
+		this.processorHelper = ProcessorHelper.getAvailableProcessorHelper();
 	}
-	
+
+	@SuppressWarnings("unchecked")
+	public void resume() {
+		this.processorHelper = ProcessorHelper.getAvailableProcessorHelper();
+		assert (processorHelper != null);
+		this.processorHelper.use((ThreadContextHelper<Runnable>) this);
+		interrupt();
+	}
+
 	public T getCurrent() {
 		return target;
-	}
-	
-	private static int nextToDeliver = 0;	
-	public static <T extends Runnable> ThreadContextHelper<T>  getNewThreadContextHelper(){
-		ThreadContextHelper<T> current = new ThreadContextHelper<T>(nextToDeliver);
-		nextToDeliver = (nextToDeliver + 1) % tchs.size();
-		return current;
 	}
 }
