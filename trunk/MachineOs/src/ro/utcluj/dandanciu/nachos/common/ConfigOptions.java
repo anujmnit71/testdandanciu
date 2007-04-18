@@ -23,9 +23,9 @@ public class ConfigOptions {
 
 	/**
 	 * The period of time (miliseconds) between two ticks <br/> Default value:
-	 * 1000 (miliseconds)
+	 * 100 (miliseconds)
 	 */
-	public static final int TickLenght = 1000;
+	public static final int TickLenght = 3;
 
 	/**
 	 * The number of sectors a hardisk trak has <br/> Default value: 32
