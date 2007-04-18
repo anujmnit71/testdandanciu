@@ -1,10 +1,18 @@
 package ro.utcluj.dandanciu.nachos.machine;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import ro.utcluj.dandanciu.nachos.common.InterruptCode;
+import ro.utcluj.dandanciu.nachos.common.IrqType;
+
 public class Interrupt {
 
 	private Device device;
 
 	private int priority;
+	
+	private InterruptCode code;
 
 	/**
 	 * Hold the id of the local apic currently servicing a pending request for
@@ -72,7 +80,7 @@ public class Interrupt {
 	}
 
 	public void setCause(PhysicalException exception) {
-		this.cause = exception;		
+		this.cause = exception;
 	}
 
 	/**
@@ -82,4 +90,17 @@ public class Interrupt {
 		return cause;
 	}
 
+	/**
+	 * @return the code
+	 */
+	public InterruptCode getCode() {
+		return code;
+	}
+
+	/**
+	 * @param code the code to set
+	 */
+	public void setCode(InterruptCode code) {
+		this.code = code;
+	}
 }

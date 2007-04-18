@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 
 import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 
-public class ClockGenerator extends Timer {
+public class ClockGenerator {
 	/**
 	 * Logger for this class
 	 */
@@ -22,27 +22,25 @@ public class ClockGenerator extends Timer {
 			}
 
 			Machine.getInstance().tick();
-			
-			//reschedule
-			schedule();
-
+		
 			if (logger.isDebugEnabled()) {
 				logger.debug("ClockGeneratorTask.run() - end"); 
 			}
 		}
-		void schedule() {
-			ClockGenerator.this.schedule(new ClockGeneratorTask(), ConfigOptions.TickLenght);
-		}
-
 	}
 
+
+    
 	public ClockGenerator() {
-		super();
 		if (logger.isDebugEnabled()) {
 			logger.debug("ClockGenerator() - start"); 
 		}
 
-		new ClockGeneratorTask().schedule();
+		int delay = ConfigOptions.TickLenght;   // delay
+	    int period = ConfigOptions.TickLenght;  // repeat
+	    Timer timer = new Timer();
+	    
+	    timer.scheduleAtFixedRate(new ClockGeneratorTask(), delay, period);
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("ClockGenerator() - end"); 

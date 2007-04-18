@@ -1,4 +1,6 @@
-package ro.utcluj.dandanciu.nachos.machine;
+package ro.utcluj.dandanciu.nachos.machine.vm;
+
+import ro.utcluj.dandanciu.nachos.machine.Interrupt;
 
 public class InterruptRequest implements Comparable<InterruptRequest> {
 	
@@ -51,9 +53,7 @@ public class InterruptRequest implements Comparable<InterruptRequest> {
 	public int compareTo(InterruptRequest o) {
 		if(this.interrupt.getPriority() > o.interrupt.getPriority())
 			return 1;
-		if(this.interrupt.getPriority() < o.interrupt.getPriority())
-			return -1;		
-		return 0;
+		return -1;	
 	}
 
 }

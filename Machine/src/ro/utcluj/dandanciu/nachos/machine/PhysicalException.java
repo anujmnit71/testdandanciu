@@ -1,5 +1,8 @@
 package ro.utcluj.dandanciu.nachos.machine;
 
+import ro.utcluj.dandanciu.nachos.machine.vm.InterruptRequest;
+import ro.utcluj.dandanciu.nachos.machinetoos.ProcessorInterface;
+
 public class PhysicalException extends Exception {
 	
 	/**
@@ -44,7 +47,7 @@ public class PhysicalException extends Exception {
 		this.description = description;
 	}
 	
-	public InterruptRequest getInterruptRequest(Processor processor){
+	public InterruptRequest getInterruptRequest(ProcessorInterface processor){
 		InterruptRequest rq = new InterruptRequest();
 		Interrupt interrupt = new Interrupt();
 		interrupt.setDevice(null);
