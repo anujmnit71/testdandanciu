@@ -6,6 +6,8 @@ package ro.utcluj.dandanciu.nachos.machine;
 import java.util.ArrayList;
 import java.util.List;
 
+import ro.utcluj.dandanciu.nachos.common.IrqType;
+
 /**
  * @author Dan Danciu
  * 
@@ -16,20 +18,14 @@ public class IOApic implements Apic {
 
 	private List<LocalApic> localApics = new ArrayList<LocalApic>();
 
-	private Interrupt[] interrupts = new Interrupt[8];
-
 	public void addLocalApic(LocalApic localApic) {
 		localApics.add(localApic);
 	}
 
-
-	public void setInterruptsArray(Interrupt[] interrupts) {
-		this.interrupts = interrupts;
-	}
-
 	private void dispach(int code) {
 		counter++; // increment counter
-		Interrupt intr = interrupts[code];
+		Interrupt intr = Machine.getInstance().interruptTable.get(IrqType.get(code));
+		assert(intr != null);
 		LocalApic apicToService = null;
 		if(intr.getApicId() < 0) {
 			//if no pending requests exist for this interupt get a local apic by "round robin"
@@ -39,7 +35,9 @@ public class IOApic implements Apic {
 			apicToService = localApics.get(intr.getApicId());
 		}
 		
+		apicToService.IRqX(code);
 		
+
 	}
 
 	/* (non-Javadoc)

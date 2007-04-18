@@ -3,17 +3,19 @@
  */
 package ro.utcluj.dandanciu.nachos.machine;
 
+import ro.utcluj.dandanciu.nachos.machinetoos.Interruptable;
+
 /**
  * @author Dan Danciu
  * 
  */
-public abstract class Device extends Thread {
+public abstract class Device extends Thread implements Interruptable {
 
-	private int code;
+	protected int code;
 
-	private Apic apic;
+	protected Apic apic;
 
-	private boolean inService = false;
+	protected boolean inService = false;
 
 	public Device(Apic apic, int code) {
 		this.apic = apic;

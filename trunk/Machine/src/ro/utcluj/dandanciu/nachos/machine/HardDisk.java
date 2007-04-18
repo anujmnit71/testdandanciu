@@ -14,7 +14,7 @@ import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
  * @author Dan Danciu
  * 
  */
-public class HardDisk extends Device implements Runnable {
+public class HardDisk extends Device {
 	/**
 	 * Logger for this class
 	 */

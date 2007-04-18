@@ -1,18 +1,29 @@
 package ro.utcluj.dandanciu.nachos.machine;
 
+import org.apache.log4j.Logger;
+
 import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.common.Constants;
+import ro.utcluj.dandanciu.nachos.common.ProcessorHelper;
 import ro.utcluj.dandanciu.nachos.machine.exceptions.IllegalWordSizeException;
+import ro.utcluj.dandanciu.nachos.machine.vm.InterruptRequest;
 import ro.utcluj.dandanciu.nachos.machine.vm.LocalMemoryManagementUnit;
 import ro.utcluj.dandanciu.nachos.machine.vm.MemoryConfigOptions;
+import ro.utcluj.dandanciu.nachos.machinetoos.ProcessorInterface;
 
-public class Processor {
+public class Processor implements ProcessorInterface {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(Processor.class);
 
 	private ProcessorState state;
 
 	private LocalApic localApic;
 
 	private int id;
+
+	private ProcessorHelper helper;
 
 	public Processor(int id) {
 		this.id = id;
@@ -26,22 +37,40 @@ public class Processor {
 		cache = new Memory(MemoryConfigOptions.CACHE_ADDRESS_WORD_SIZE,
 				MemoryConfigOptions.CACHAE_DATA_WORD_SIZE,
 				MemoryConfigOptions.CACHE_SIZE_IN_KB);
+
+		helper = ProcessorHelper.generate(this);
 	}
 
 	public void tick() {
-		if (this.getState().equals(ProcessorState.RUNNING)) {
-			if (!getLocalApic().isEmpty()) {
-				InterruptRequest ir = getLocalApic().getNext();
-				ir.getInterrupt().getDevice().handle();
-				return;
+		logger.info("DA");
+		if (logger.isDebugEnabled()) {
+			logger.debug("tick() - start"); //$NON-NLS-1$
+		}
+
+		if (!getLocalApic().isEmpty()) {
+			InterruptRequest ir = getLocalApic().getNext();
+			helper.interrupt(ir.getInterrupt().getCode(), ir.getInterrupt()
+					.getDevice());
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("tick() - end"); //$NON-NLS-1$
 			}
-			try {
+			return;
+		}
+		if (this.getState().equals(ProcessorState.RUNNING)) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Processor.RUNNING"); //$NON-NLS-1$
+			}
+			/*try {
 				this.oneInstruction();
 			} catch (PhysicalException e) {
 				getLocalApic().IRqX(e.getType());
-			}
+			}*/
 		}
 
+		if (logger.isDebugEnabled()) {
+			logger.debug("tick() - end"); //$NON-NLS-1$
+		}
 	}
 
 	// User program CPU state. The full set of MIPS registers, plus a few
@@ -827,6 +856,14 @@ public class Processor {
 	 */
 	public void setCache(Memory cache) {
 		this.cache = cache;
+	}
+
+	public void bussy() {
+		this.state = ProcessorState.RUNNING;
+	}
+
+	public void idle() {
+		this.state = ProcessorState.IDLE;
 	}
 
 }

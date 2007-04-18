@@ -6,7 +6,9 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class InputDevice extends Device {
+import ro.utcluj.dandanciu.nachos.machinetoos.interrupts.InputDeviceInterface;
+
+public class InputDevice extends Device implements InputDeviceInterface {
 
 	public InputDevice(Apic apic, int code) {
 		super(apic, code);
@@ -22,6 +24,9 @@ public class InputDevice extends Device {
 
 	boolean empty = true;
 
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.nachos.machine.InputDeviceInterface#getChar()
+	 */
 	public char getChar() {
 		return data.poll();
 	}
