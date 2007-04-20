@@ -37,11 +37,14 @@ public class ProcessorHelper {
 		return null;
 	}
 
+	private final int id;
+	
 	private ProcessorInterface processor;
 		
 	private ThreadContextHelper<Runnable> current;
 
 	private ProcessorHelper(){
+		this.id = processorHelpers.size();
 		current = null;
 	}
 
@@ -79,11 +82,13 @@ public class ProcessorHelper {
 	}
 	
 	public void use(ThreadContextHelper<Runnable> tch){
+		logger.info("USE  --- Proc#"+id);
 		this.current = tch;
 		this.processor.bussy();
 	}
 	
 	public void idle() {
+		logger.info("IDLE  --- Proc#"+id);
 		this.current = null;
 		this.processor.idle();
 	}

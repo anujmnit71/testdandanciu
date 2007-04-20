@@ -2,10 +2,6 @@ package ro.utcluj.dandanciu.nachos.ostomachine;
 
 import org.apache.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ro.utcluj.dandanciu.nachos.common.ConfigOptions;
 import ro.utcluj.dandanciu.nachos.common.ProcessorHelper;
 
 public class ThreadContextHelper<T extends Runnable> {
@@ -51,7 +47,7 @@ public class ThreadContextHelper<T extends Runnable> {
 
 
 	@SuppressWarnings("unchecked")
-	public void start(T target) {
+	public void start(final T target) {
 		
 		assert (!associated);
 		
@@ -59,26 +55,28 @@ public class ThreadContextHelper<T extends Runnable> {
 		
 		this.associated = true;
 		
-		this.processorHelper = ProcessorHelper.getAvailableProcessorHelper();
-		
-		assert (this.processorHelper != null);
-		
-		this.processorHelper.use((ThreadContextHelper<Runnable>) this);
-		
-		this.running = true;
+		this.running = false;
 		if(firstThread) {
 			firstThread = false;
-			
 			target.run();
+			//this.done = true;
 		} else {
-			javaThread = new Thread(target);
+			javaThread = new Thread(
+					new Runnable() {
+						public void run() {
+							waitForInterrupt();							
+							target.run();
+							logger.info("THREAD FINISHED");
+							done = true;
+						}
+					}, "MyThread"
+			);
 		
 			this.javaThread.start();
 		}
 	}
 
 	private synchronized void waitForInterrupt() {
-		logger.info("WAIT FOR INTERRUPT");
 		while (!running) {
 			try {
 				wait();
@@ -110,13 +108,12 @@ public class ThreadContextHelper<T extends Runnable> {
 		this.processorHelper = null;
 		this.running = false;
 		waitForInterrupt();
-		
+		logger.info("THREAD UN-YIELDED");
 		if (done) {
+			logger.info("THREAD DEATH");
 			this.interrupt(); //for safety
 			throw new ThreadDeath();
 		}
-		
-		this.processorHelper = ProcessorHelper.getAvailableProcessorHelper();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -128,6 +125,19 @@ public class ThreadContextHelper<T extends Runnable> {
 	}
 
 	public T getCurrent() {
+		return target;
+	}
+
+	public void finish() {
+		//TODO: check this for the running threa case
+		this.notify(); //for safety, some threads might not be ready
+		this.done = true;
+	}
+
+	/**
+	 * @return the target
+	 */
+	public T getTarget() {
 		return target;
 	}
 }
