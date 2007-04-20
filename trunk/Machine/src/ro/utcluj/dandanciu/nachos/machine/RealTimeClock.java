@@ -48,7 +48,6 @@ public class RealTimeClock extends Device{
 			if (logger.isDebugEnabled()) {
 				logger.debug("run() - start"); //$NON-NLS-1$
 			}
-
 			RealTimeClock.this.handle();
 			
 			if (logger.isDebugEnabled()) {
