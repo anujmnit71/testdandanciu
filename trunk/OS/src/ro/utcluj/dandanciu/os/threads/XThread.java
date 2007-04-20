@@ -18,4 +18,7 @@ public interface XThread extends Runnable{
 	
 	void resume();	
 
+	void setName(String name);
+	
+	String getName();
 }

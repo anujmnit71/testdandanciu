@@ -3,11 +3,13 @@
  */
 package ro.utcluj.dandanciu.os.threads;
 
+import org.apache.log4j.Logger;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
-import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
+import ro.utcluj.dandanciu.os.threads.servers.ThreadManager;
 import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
 
 /**
@@ -15,6 +17,10 @@ import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
  *
  */
 public abstract class XThreadAbstract implements XThread {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(XThreadAbstract.class);
 	
 	protected ThreadInfo info;
 	
@@ -60,17 +66,16 @@ public abstract class XThreadAbstract implements XThread {
 	 */
 	public <T extends XThread> void fork(T parent) {
 		
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 		SystemTask.getInstance().kernellCall(KernelCallType.SYS_FORK, new Object[] {
 				this, parent
 		});
 
 		this.ready();
 		tch = new ThreadContextHelper<XThread>();
-		running();
 		tch.start(this);
-		
-		ProcessManager.exitRegion();
+		ready();
+		ThreadManager.exitRegion();
 	}
 
 	
@@ -87,6 +92,7 @@ public abstract class XThreadAbstract implements XThread {
 		for(XThreadAbstract xthread : joinedThreads) {
 			xthread.ready();
 		}
+		tch.finish();
 		info.setState(ThreadState.DEAD);
 	}
 
@@ -96,14 +102,14 @@ public abstract class XThreadAbstract implements XThread {
 	 * Each thread can be joined only to one thread.
 	 */
 	public <T extends XThread> void join(T current) {
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 		
 		this.blocked();
 		XThreadAbstract ct = (XThreadAbstract) current;
 		
 		ct.joinedThreads.add(this);
 		//TODO: ckeck this, should this wait in a loop untill current has finished
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 	}
 
 	private void running() {
@@ -112,28 +118,27 @@ public abstract class XThreadAbstract implements XThread {
 
 	private void blocked() {
 		info.setState(ThreadState.BLOCKED);
+		ThreadManager.blocked(this);
 	}
 
 	private void ready() {
 		info.setState(ThreadState.READY);		
-		ProcessManager.addReadyThread(this);
+		ThreadManager.addReadyThread(this);
 	}
 
 	public void sleep(long ticks) {
 		
-		ProcessManager.enterRegion();
-		//TODO: add the alarm which will wakeup this thread
+		ThreadManager.enterRegion();
+		this.blocked();
 		SystemTask.getInstance().kernellCall(KernelCallType.SYS_SETALARM,
 				new Object[] {new Long(ticks),
 						new WakeUpAlarm(this)});
-    	XThreadAbstract nextThread = (XThreadAbstract) ProcessManager.next2Run();
-	    if (nextThread != null) {
+    	XThreadAbstract nextThread = (XThreadAbstract) ThreadManager.next2Run();
+    	if(nextThread != null) {
 	    	nextThread.switchFrom(this);
 	    }
-	    ProcessManager.exitRegion();
-	    
-	    info.setState(ThreadState.BLOCKED);
-		tch.yield();
+	    ThreadManager.exitRegion();
+	    tch.yield();
 	}
 
 	/* (non-Javadoc)
@@ -143,17 +148,18 @@ public abstract class XThreadAbstract implements XThread {
 	    XThreadAbstract nextThread;
 
 
-	    ProcessManager.enterRegion();
+	    ThreadManager.enterRegion();
 	    
-	    nextThread = (XThreadAbstract ) ProcessManager.next2Run();
+	    nextThread = (XThreadAbstract ) ThreadManager.next2Run();
 	    if (nextThread != null) {
-	    	ProcessManager.addReadyThread(this);
+	    	ThreadManager.addReadyThread(this);
 	    	nextThread.switchFrom(this);
 	    }
-	    ProcessManager.exitRegion();
+	    ThreadManager.exitRegion();
 	  }
 
 	public <T extends XThread> void switchFrom(T previous) {
+		logger.info("SWITCH: " + ((XThreadAbstract) previous).name + " WITH " + this.name);
 		((XThreadAbstract) previous).saveContext();
 		this.restoreContext();
 		this.running();
@@ -200,5 +206,13 @@ public abstract class XThreadAbstract implements XThread {
 		public void run(){
 			target.ready();
 		}		
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

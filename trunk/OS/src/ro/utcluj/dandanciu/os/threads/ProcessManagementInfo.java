@@ -14,8 +14,9 @@ public class ProcessManagementInfo {
 	 */
 	
 	/**
-	 * Exit status
+	 * Exit status, normal exit 0 (zero)
 	 */
+	int exitStatus = 0;
 	
 	/**
 	 * Signal status
@@ -171,5 +172,13 @@ public class ProcessManagementInfo {
 	 */
 	public void setUserId(int userId) {
 		this.userId = userId;
+	}
+
+	public int getExitStatus() {
+		return exitStatus;
+	}
+
+	public void setExitStatus(int exitStatus) {
+		this.exitStatus = exitStatus;
 	}
 }

@@ -7,7 +7,9 @@ public enum KernelCallType {
 	  SYS_EXEC, 		//Set stack pointer after EXEC call
 	 
 	  SYS_EXIT,			//A process has exited
-	 
+		 
+	  SYS_JOIN,			//Wait on a process to finish
+		 
 	  SYS_NICE,			//Set scheduling priority
 	 
 	  SYS_PRIVCTL,		//Set or change privileges

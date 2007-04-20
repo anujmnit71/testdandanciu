@@ -1,7 +1,5 @@
 package ro.utcluj.dandanciu.os.threads.tasks;
 
-import java.util.Arrays;
-
 import org.apache.log4j.Logger;
 
 import ro.utcluj.dandanciu.os.threads.Kernel;
@@ -10,6 +8,7 @@ import ro.utcluj.dandanciu.os.threads.KernelCallType;
 import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
 import ro.utcluj.dandanciu.os.threads.structs.TimeInfo;
 import ro.utcluj.dandanciu.os.threads.util.InfoType;
+import ro.utcluj.dandanciu.os.threads.util.MutableObject;
 
 /**
  * 
@@ -105,15 +104,82 @@ public class SystemTask {
 			
 			/**
 			 * Implementation of the fork call to the kernel
-			 *@param params array of Objects, param[0] - the forking thread
-			 * and param[1] - the thread from which the fork is being 
-			 * done
+			 * @param params array of Objects:
+			 * <ul>
+			 * 	<li> param[0] - the forking thread </li>
+			 *  <li> param[1] - the thread from which the exec is being 
+			 * done </li>
+			 * </ul>
 			 * @return Returns <code>null</code> no matter what 
 			 */
 			public Object call(Object[] params) {
 				//implement fork kernel call
 				Kernel.getKernel().fork((XThreadAbstract)params[0], (XThreadAbstract)params[1]);
 				return null;
+			}
+		});
+		
+		/**
+		 * Makes the exit call to the Kernel
+		 */
+		setKernelCall(KernelCallType.SYS_EXIT, new KernelCall() {
+			
+			/**
+			 * Implementation of the fork call to the kernel
+			 * @param params array of Objects:
+			 * <ul>
+			 * 	<li> param[0] - the calling thread </li>
+			 *  <li> param[1] - the exit code</li>
+			 * </ul>
+			 * @return Returns <code>null</code> no matter what 
+			 */
+			public Object call(Object[] params) {
+				//implement fork kernel call
+				Kernel.getKernel().exit((XThreadAbstract)params[0], (Integer)params[1]);
+				return null;
+			}
+		});
+		
+		/**
+		 * Makes the EXEC call to the Kernel
+		 */
+		setKernelCall(KernelCallType.SYS_EXEC, new KernelCall() {
+			
+			/**
+			 * Implementation of the exec call to the kernel
+			 *@param params array of Objects:
+			 * <ul>
+			 * 	<li> param[0] - the forking thread </li>
+			 *  <li> param[1] - the new executable</li>
+			 *  <li> param[2] - the number of arguments to the new executable</li>
+			 *  <li> param[3] - the String containg the arguments</li>
+			 * </ul>
+			 * @return Returns <code>null</code> no matter what 
+			 */
+			public Object call(Object[] params) {
+				//implement fork kernel call
+				return Kernel.getKernel().exec((XThreadAbstract) params[0], (String)params[1], (Integer)params[2], (String) params[3]);
+			}
+		});
+		
+		/**
+		 * Makes the EXEC call to the Kernel
+		 */
+		setKernelCall(KernelCallType.SYS_JOIN, new KernelCall() {
+			
+			/**
+			 * Implementation of the join call to the kernel
+			 * @param params array of Objects:
+			 * <ul>
+			 * 	<li> param[0] - the thread invoking the call</li>
+			 *  <li> param[1] - the process id of the thread we want to wait for</li>
+			 *  <li> param[2] - an object in which we will return the exit code</li>
+			 * </ul>
+			 * @return Returns <code>null</code> no matter what 
+			 */
+			public Object call(Object[] params) {
+				//implement fork kernel call
+				return Kernel.getKernel().join((XThreadAbstract) params[0], (Integer)params[1], (MutableObject)params[2]);
 			}
 		});
 		
@@ -149,6 +215,9 @@ public class SystemTask {
 				
 				if(((InfoType)params[0]) ==  InfoType.THREAD) { 
 					return Kernel.getKernel().getThreadInfo((Integer) params[1]);
+				}
+				if(((InfoType)params[0]) ==  InfoType.FILE_MANAGEMENT) { 
+					return Kernel.getKernel().getFileManagementInfo((Integer) params[1]);
 				}
 				//TODO add other info request handlers
 				return null;
@@ -187,7 +256,6 @@ public class SystemTask {
 	 * @return the return value of the kernel call
 	 */
 	public Object kernellCall(KernelCallType type, Object[] params) {
-		logger.debug("KERNEL CALL["+type+"]( "+Arrays.toString(params)+")");
 		return kernelCalls[type.ordinal()].call(params);
 	}
 	

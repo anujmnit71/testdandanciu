@@ -1,6 +1,11 @@
 package ro.utcluj.dandanciu.os.threads.util;
 
 public enum InfoType {
-	THREAD
-
+	THREAD,
+	
+	PROCESS,
+	
+	FILE_MANAGEMENT,
+	
+	SYSTEM
 }
