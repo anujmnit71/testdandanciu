@@ -40,7 +40,7 @@ public class ThreadInfo {
 	/**
 	 * Scheduling ticks left
 	 */
-	private int ticks = -1;
+	private int ticks = 10;
 	/**
 	 * CPU time used 
 	 */

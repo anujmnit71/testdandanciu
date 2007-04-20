@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import ro.utcluj.dandanciu.os.threads.XThread;
-import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
+import ro.utcluj.dandanciu.os.threads.servers.ThreadManager;
 
 public class Condition {
 	/**
@@ -30,10 +30,10 @@ public class Condition {
 
 		assert (conditionLock.isHeldByThread(requester));
 		conditionLock.release(requester);
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 		waitingThreads.offer(requester);
 		requester.yield(); //TODO: check this (may be ok)
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 		conditionLock.acquire(requester);
 
 		if (logger.isDebugEnabled()) {
@@ -47,12 +47,12 @@ public class Condition {
 		}
 
 		assert (conditionLock.isHeldByThread(requester));
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 		XThread newThread = (XThread) (waitingThreads.remove());
 		if (newThread != null) {
-			ProcessManager.addReadyThread(newThread);
+			ThreadManager.addReadyThread(newThread);
 		}
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("signal::" + name + "(Lock, XThread) - end"); 
@@ -66,13 +66,13 @@ public class Condition {
 
 	    assert (conditionLock.isHeldByThread(requester));
 
-	    ProcessManager.enterRegion();
+	    ThreadManager.enterRegion();
 
 	    while (!waitingThreads.isEmpty()) {
-	      ProcessManager.addReadyThread((XThread)(waitingThreads.poll()));
+	      ThreadManager.addReadyThread((XThread)(waitingThreads.poll()));
 	    }
 
-	    ProcessManager.exitRegion();
+	    ThreadManager.exitRegion();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("broadcast::" + name + "(Lock, XThread) - end"); 

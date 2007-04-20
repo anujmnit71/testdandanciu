@@ -1,14 +1,21 @@
-package ro.utcluj.dandanciu.os.threads.tests;
+package ro.utcluj.dandanciu.os.tests;
+
+import org.apache.log4j.Logger;
 
 import org.apache.log4j.PropertyConfigurator;
 
 import ro.utcluj.dandanciu.nachos.machine.Machine;
+import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
 import ro.utcluj.dandanciu.os.threads.Kernel;
 import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
 
 import junit.framework.TestCase;
 
 public class TestOS extends TestCase {
+	/**
+	 * Logger for this class
+	 */
+	private static final Logger logger = Logger.getLogger(TestOS.class);
 	
 	private Kernel kernel;
 	
@@ -31,9 +38,10 @@ public class TestOS extends TestCase {
 
 			@Override
 			public void run() {
+				this.name = "TestOs";
 				for(int i = 0; i < 5; i++){
-					System.out.println("ana are "+ i + " mere");
-					this.sleep(3);
+					System.out.println("Ana are "+ i + " mere: ");
+					this.sleep(300);
 				}
 			}
 

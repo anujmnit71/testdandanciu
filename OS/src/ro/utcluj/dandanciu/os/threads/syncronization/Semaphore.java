@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import ro.utcluj.dandanciu.os.threads.XThread;
-import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
+import ro.utcluj.dandanciu.os.threads.servers.ThreadManager;
 
 public class Semaphore {
 	/**
@@ -47,7 +47,7 @@ public class Semaphore {
 			logger.debug("P::" + name + "(XThread) - start"); 
 		}
 
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 
 		while (value == 0) { // semaphore not available
 			queue.offer(requester);
@@ -56,7 +56,7 @@ public class Semaphore {
 		value--; // semaphore available,
 		// consume its value
 
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("P::" + name + "(XThread) - end"); 
@@ -75,13 +75,13 @@ public class Semaphore {
 		}
 
 		XThread thread;
-		ProcessManager.enterRegion();
+		ThreadManager.enterRegion();
 
 		thread = (XThread) queue.remove();
 		if (thread != null) // make thread ready, consuming the V immediately
-			ProcessManager.addReadyThread(thread);
+			ThreadManager.addReadyThread(thread);
 		value++;
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 
 		if (logger.isDebugEnabled()) {
 			logger.debug("V::" + name + "() - end"); 

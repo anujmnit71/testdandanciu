@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
 
 import ro.utcluj.dandanciu.nachos.machinetoos.Interruptable;
 import ro.utcluj.dandanciu.nachos.ostomachine.InterruptServiceRoutineInterface;
-import ro.utcluj.dandanciu.os.threads.servers.ProcessManager;
+import ro.utcluj.dandanciu.os.threads.servers.ThreadManager;
 
 public class ClockTask implements InterruptServiceRoutineInterface {
 	/**
@@ -69,12 +69,13 @@ public class ClockTask implements InterruptServiceRoutineInterface {
 	 * @see ro.utcluj.dandanciu.os.threads.tasks.InterruptServiceInterface#doHandle()
 	 */
 	public void doHandle(Interruptable interrupt) {
-		ProcessManager.enterRegion();
+		logger.debug("TICK");
+		ThreadManager.enterRegion();
 		// adjust realtime
 		realtime++;
 		// increment the current thread's ticks, also will check if any of
 		// the threads should be switched
-		ProcessManager.tick();
+		ThreadManager.tick();
 		/*
 		 * Check if there are alarms to be called. If not just decrement the
 		 * timeLeft for the first entry.
@@ -85,15 +86,16 @@ public class ClockTask implements InterruptServiceRoutineInterface {
 				AlarmEntry first = alarms.first();
 				if (first.timeLeft == 0) {
 					alarms.remove(first);
-					System.out.println("alarm.run");
 					first.target.run();
 				} else {
 					first.timeLeft--;
 					flag = false;
 				}
+			} else {
+				flag = false;
 			}
 		}
-		ProcessManager.exitRegion();
+		ThreadManager.exitRegion();
 	}
 
 	public static void reset() {

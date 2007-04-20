@@ -1,41 +1,61 @@
 package ro.utcluj.dandanciu.os.threads;
 
+import java.util.Set;
+import java.util.TreeSet;
+
+import ro.utcluj.dandanciu.os.filesystem.OpenFile;
+import ro.utcluj.dandanciu.os.utils.OsConfigOptions;
+
 public class FileManagementInfo {
-	/**
-	 * UMASK mask
-	 */
+
 	/**
 	 * Root directory
 	 */
+	private String rootDirectory = OsConfigOptions.filePathSeparator;
 	/**
 	 * Working directory
 	 */
+	private String workingDirectory = OsConfigOptions.filePathSeparator;
 	/**
 	 * File descriptors
 	 */
+	private Set<OpenFile> openFileList = new TreeSet<OpenFile>();
 	/**
-	 * Real id
+	 * @return the openFileList
 	 */
+	public Set<OpenFile> getOpenFileList() {
+		return openFileList;
+	}
 	/**
-	 * Effective UID
+	 * @param openFileList the openFileList to set
 	 */
+	public void setOpenFileList(Set<OpenFile> openFileList) {
+		this.openFileList = openFileList;
+	}
 	/**
-	 * Real GID
+	 * @return the rootDirectory
 	 */
+	public String getRootDirectory() {
+		return rootDirectory;
+	}
 	/**
-	 * Effective GID
+	 * @param rootDirectory the rootDirectory to set
 	 */
+	public void setRootDirectory(String rootDirectory) {
+		this.rootDirectory = rootDirectory;
+	}
 	/**
-	 * Controlling tty
+	 * @return the workingDirectory
 	 */
+	public String getWorkingDirectory() {
+		return workingDirectory;
+	}
 	/**
-	 * Save area for read/write
+	 * @param workingDirectory the workingDirectory to set
 	 */
-	/**
-	 * System call parameters
-	 */
-	/**
-	 * Various flag bits
-	 */
+	public void setWorkingDirectory(String workingDirectory) {
+		this.workingDirectory = workingDirectory;
+	}   
+
 
 }
