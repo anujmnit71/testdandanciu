@@ -42,11 +42,9 @@ public class Processor implements ProcessorInterface {
 	}
 
 	public void tick() {
-		logger.info("DA");
 		if (logger.isDebugEnabled()) {
 			logger.debug("tick() - start"); //$NON-NLS-1$
 		}
-
 		if (!getLocalApic().isEmpty()) {
 			InterruptRequest ir = getLocalApic().getNext();
 			helper.interrupt(ir.getInterrupt().getCode(), ir.getInterrupt()
