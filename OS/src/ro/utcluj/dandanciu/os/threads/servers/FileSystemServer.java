@@ -9,6 +9,7 @@ import ro.utcluj.dandanciu.os.threads.KernelCallType;
 import ro.utcluj.dandanciu.os.threads.tasks.SystemTask;
 import ro.utcluj.dandanciu.os.threads.util.InfoType;
 import ro.utcluj.dandanciu.os.userprogs.syscall.XUserThread;
+import ro.utcluj.dandanciu.os.utils.IdTable;
 import ro.utcluj.dandanciu.os.utils.OsConfigOptions;
 import ro.utcluj.dandanciu.os.utils.Utils;
 
@@ -24,8 +25,8 @@ public class FileSystemServer {
 		public boolean markedForDelete;
 	}
 
-	static OpenFileTableEntry[] openFileTable = 
-			new OpenFileTableEntry[OsConfigOptions.OpenFileTableInitialSize];
+	private static IdTable<OpenFileTableEntry> openFileTable = 
+			new IdTable<OpenFileTableEntry>(OsConfigOptions.OpenFileTableInitialSize, OsConfigOptions.OpenFileTableSizeIncrement);
 
 	public static void setFileSystem(FileSystem fs) {
 		fileSystem = fs;
@@ -37,16 +38,13 @@ public class FileSystemServer {
 				getFileManagementInfo(thread)), true);
 		entry.info = getFileManagementInfo(thread);
 		entry.info.getOpenFileList().add(entry.openFile);
-		int id = Utils.nextId(openFileTable,
-				OsConfigOptions.OpenFileTableSizeIncrement);
-		openFileTable[id] = entry;
-		return id;
+		return openFileTable.put(entry);
 	}
 
 	public static int close(XUserThread thread, int fileDescriptor) {
 
-		OpenFileTableEntry entry = openFileTable[fileDescriptor];
-		openFileTable[fileDescriptor] =  null;
+		OpenFileTableEntry entry = openFileTable.get(fileDescriptor);
+		openFileTable.clear(fileDescriptor);
 		entry.openFile.close();
 		if (entry.markedForDelete) {
 			delete(thread, entry.openFile.getName());
@@ -60,10 +58,7 @@ public class FileSystemServer {
 				getFileManagementInfo(thread)), false);
 		entry.info = getFileManagementInfo(thread);
 		entry.info.getOpenFileList().add(entry.openFile);
-		int id = Utils.nextId(openFileTable,
-				OsConfigOptions.OpenFileTableSizeIncrement);
-		openFileTable[id] = entry;
-		return id;
+		return openFileTable.put(entry);
 	}
 
 	/**
@@ -84,14 +79,14 @@ public class FileSystemServer {
 	}
 
 	public static int read(XUserThread thread, int fileDescriptor, byte[] buffer) {
-		OpenFileTableEntry entry = openFileTable[fileDescriptor];
+		OpenFileTableEntry entry = openFileTable.get(fileDescriptor);
 		return entry.openFile.read(thread, buffer, entry.openFile.tell(),
 				buffer.length);
 	}
 
 	public static int write(XUserThread thread, int fileDescriptor,
 			byte[] buffer, int count) {
-		OpenFileTableEntry entry = openFileTable[fileDescriptor];
+		OpenFileTableEntry entry = openFileTable.get(fileDescriptor);
 		return entry.openFile.write(thread, buffer, entry.openFile.tell(),
 				buffer.length);
 	}
