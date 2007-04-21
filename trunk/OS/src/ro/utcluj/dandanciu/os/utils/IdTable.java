@@ -1,6 +1,7 @@
 package ro.utcluj.dandanciu.os.utils;
 
 import java.util.Arrays;
+import java.util.Iterator;
 
 /**
  * This class represents a table for holding objects at a certain id, when the
@@ -10,7 +11,7 @@ import java.util.Arrays;
  *
  * @param <T> the type of the objects hold in this table
  */
-public class IdTable<T> {
+public class IdTable<T> implements Iterable<T>{
 
 	T[] objects;
 	private int increment;
@@ -94,6 +95,10 @@ public class IdTable<T> {
 		int id = table.objects.length;
 		table.objects = newArray;
 		return id;
+	}
+
+	public Iterator<T> iterator() {
+		return Arrays.asList(objects).iterator();
 	}
 	
 }
