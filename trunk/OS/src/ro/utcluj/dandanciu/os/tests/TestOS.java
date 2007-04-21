@@ -1,15 +1,13 @@
 package ro.utcluj.dandanciu.os.tests;
 
-import org.apache.log4j.Logger;
+import junit.framework.TestCase;
 
+import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
 import ro.utcluj.dandanciu.nachos.machine.Machine;
-import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
 import ro.utcluj.dandanciu.os.threads.Kernel;
 import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
-
-import junit.framework.TestCase;
 
 public class TestOS extends TestCase {
 	/**

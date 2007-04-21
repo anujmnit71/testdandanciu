@@ -6,6 +6,7 @@ import org.apache.log4j.PropertyConfigurator;
 import ro.utcluj.dandanciu.nachos.machine.Machine;
 import ro.utcluj.dandanciu.os.threads.Kernel;
 import ro.utcluj.dandanciu.os.threads.XThreadAbstract;
+import ro.utcluj.dandanciu.os.threads.kernel.ThreadsKernel;
 import ro.utcluj.dandanciu.os.userprogs.syscall.XUserThread;
 import junit.framework.TestCase;
 

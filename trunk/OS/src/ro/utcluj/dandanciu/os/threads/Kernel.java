@@ -4,10 +4,13 @@ import java.io.File;
 import java.util.ArrayList;
 
 import ro.utcluj.dandanciu.nachos.common.InterruptCode;
+import ro.utcluj.dandanciu.nachos.machine.Machine;
 import ro.utcluj.dandanciu.nachos.ostomachine.InterruptServiceTable;
 import ro.utcluj.dandanciu.nachos.ostomachine.ThreadContextHelper;
 import ro.utcluj.dandanciu.os.filesystem.FileSystem;
 import ro.utcluj.dandanciu.os.filesystem.stub.StubFileSystem;
+import ro.utcluj.dandanciu.os.threads.kernel.GenericKernel;
+import ro.utcluj.dandanciu.os.threads.kernel.ThreadsKernel;
 import ro.utcluj.dandanciu.os.threads.servers.FileSystemServer;
 import ro.utcluj.dandanciu.os.threads.servers.InformationServer;
 import ro.utcluj.dandanciu.os.threads.tasks.ClockTask;
@@ -17,7 +20,7 @@ import ro.utcluj.dandanciu.os.threads.util.Priority;
 import ro.utcluj.dandanciu.os.utils.OsConfigOptions;
 import ro.utcluj.dandanciu.os.utils.Utils;
 
-public class Kernel extends XThreadAbstract {
+public class Kernel extends XThreadAbstract implements GenericKernel, ThreadsKernel {
 	
 	private static final class CONFIG {
 		public static final int PROCESS_TABLE_INITIAL_SIZE = 10;
@@ -67,8 +70,12 @@ public class Kernel extends XThreadAbstract {
 		}
 		return kernel;
 	}
+	
+	public void terminate() {
+		//TODO add termination code
+	}
 
-	private void initialize() {
+	public void initialize() {
 		// initialize the process information table
 		processTable = new ArrayList<ProcessInfo>(CONFIG.PROCESS_TABLE_INITIAL_SIZE);
 		threadTable = new ArrayList<XThreadAbstract>(CONFIG.THREAD_TABLE_INITIAL_SIZE);		
@@ -134,10 +141,8 @@ public class Kernel extends XThreadAbstract {
 		
 	}
 
-	/**
-	 * Same process new thread
-	 * @param child
-	 * @param parent
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.os.threads.ThreadsKernel#fork(ro.utcluj.dandanciu.os.threads.XThreadAbstract, ro.utcluj.dandanciu.os.threads.XThreadAbstract)
 	 */
 	public void fork(XThreadAbstract child, XThreadAbstract parent) {
 		ThreadInfo pInfo = threadTable.get(parent.info.getThreadId()).info;
@@ -185,13 +190,11 @@ public class Kernel extends XThreadAbstract {
 	}
 
 	public void panic() {
-		assert false;
-		// TODO implement Kernel.panic
+		//TODO add message to user
+		Machine.halt();
 	}
-	/**
-	 *	//TODO add javadoc
-	 * @param threadId
-	 * @return
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.os.threads.ThreadsKernel#getThreadInfo(int)
 	 */
 	public ThreadInfo getThreadInfo(int threadId) {
 		return threadTable.get(threadId).info;
@@ -206,19 +209,8 @@ public class Kernel extends XThreadAbstract {
 		return processTable.get(threadTable.get(threadId).info.getProcessId()).getFileManagementInfo();
 	}
 
-	/**
-	 * Creates a new process which will execute the executable with the parameters.
-	 * 
-	 * What has to be done:
-	 * 	//TODO: (1) create a new process, child for the current threads process	
-	 * 	//TODO: (2) move the current thread to the new process
-	 * 	//TODO: (3) parse the parameters
-	 * 	//TODO: (4) make a new ThreadContextHelper which will run the new executable
-	 * 	//TODO: (5) return the process Id
-	 * 
-	 * @param thread
-	 * @param executable
-	 * @return returns the new process id, if error occured -1 is returned
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.os.threads.ThreadsKernel#exec(ro.utcluj.dandanciu.os.threads.XThreadAbstract, java.lang.String, java.lang.Integer, java.lang.String)
 	 */
 	public int exec(XThreadAbstract theThread, String executable, Integer argc, String argv) {
 		//TODO generate new process info
@@ -226,23 +218,8 @@ public class Kernel extends XThreadAbstract {
 		return -1;
 	}
 	
-	/**
-	 * A process has exited, by calling <code> exit EXIT_CODE</code>, from 
-	 * one of its threads, where EXIT_CODE is a integer number.
-	 * 
-	 * What has to be done:
-	 * 	(1) set exit code in process info
-	 * 	(2) kill all threads in process
-	 * 	(3) notify all processes currently waiting for this process to exit 
-	 *  (4) free thread table
-	 *  (5) free process table
-	 *  (6) set all child process parents to null
-	 *  (7) close all opened files
-	 * 
-	 * @param thread the thread from which the call was triggered
-	 * @param exitCode the exit code number, exit code <code>0</code> means that the process
-	 * has exited normally 
-	 * 
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.os.threads.ThreadsKernel#exit(ro.utcluj.dandanciu.os.threads.XThreadAbstract, java.lang.Integer)
 	 */
 	public void exit(XThreadAbstract theThread, Integer exitCode) {
 		ProcessInfo processInfo = processTable.get(theThread.info.getProcessId());
@@ -263,23 +240,8 @@ public class Kernel extends XThreadAbstract {
 		//TODO: close opened files (7)
 	}
 
-	/**
-	 * Suspend execution of the current process until the child process specified
-	 * by the processID argument has exited. If the child has already exited by the
-	 * time of the call, returns immediately. When the current process resumes, it
-	 * disowns the child process, so that join() cannot be used on that process
-	 * again.
-	 * 
-	 * What has to be done: 
-	 * 	//TODO: (1) stop current thread (OR current process)
-	 * 	//TODO: (2) add thread (OR process) to the waiting list of the process
-	 * 
-	 * @param theThread the thread invoking the call
-	 * @param processId the process id we want to wait for
-	 * @param exitCode the exit code
-	 * @return If the child exited normally, returns 1. If the child exited as a result of
-	 * an unhandled exception, returns 0. If processID does not refer to a child
-	 * process of the current process, returns -1.
+	/* (non-Javadoc)
+	 * @see ro.utcluj.dandanciu.os.threads.ThreadsKernel#join(ro.utcluj.dandanciu.os.threads.XThreadAbstract, java.lang.Integer, ro.utcluj.dandanciu.os.threads.util.MutableObject)
 	 */
 	public Object join(XThreadAbstract theThread, Integer processId, MutableObject exitCode) {
 		// TODO Auto-generated method stub
